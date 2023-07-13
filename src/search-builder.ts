@@ -1,0 +1,88 @@
+import { ParsedQs } from "qs";
+import { BuilderAbstract } from "./builder-abstract";
+import { OrderBuilder } from "./order-builder";
+import { WhereBuilder } from "./where-builder";
+
+const constructors = {
+    filter: WhereBuilder,
+    order: OrderBuilder,
+};
+
+export class SearchBuilder extends BuilderAbstract {
+    /**
+     * Get object with sequelize where conditions
+     * @returns {(Object|null)} sequelize where query
+     */
+    getWhereQuery() {
+        return this.getQueryByType('filter');
+    }
+
+    /**
+     * Get object with sequelize order conditions
+     * @returns {(Object|null)} sequelize order query
+     */
+    getOrderQuery() {
+        return this.getQueryByType('order');
+    }
+
+    /**
+     * Get object with sequelize conditions by type
+     * @param {string} type
+     * @returns {(Object|null)} sequelize query
+     */
+    getQueryByType(type: 'filter' | 'order') {
+        const request = this.request[this.config.fields[type]] as ParsedQs;
+        return SearchBuilder
+            .prepareResponse(new constructors[type](this.Model, request, this.config)
+                .getQuery()) as any;
+    }
+
+    /**
+     * Get string with limit value
+     * @returns {(int|null)} limit value
+     */
+    getLimitQuery() {
+        return SearchBuilder.prepareIntegerQuery(this.request[this.config.fields.limit] as string) || this.config['default-limit'] || null;
+    }
+
+    /**
+     * Get string with offset value
+     * @returns {(int|null)} offset value
+     */
+    getOffsetQuery() {
+        return SearchBuilder.prepareIntegerQuery(this.request[this.config.fields.offset] as string) || null;
+    }
+
+    /**
+     * Get object with all sequelize conditions (where, order, limit, offset)
+     * @returns {Object} sequelize queries with all conditions
+     */
+    getFullQuery() {
+        return Object.assign({}, {}, {
+            where: this.getWhereQuery(),
+            order: this.getOrderQuery(),
+            limit: this.getLimitQuery(),
+            offset: this.getOffsetQuery(),
+        });
+    }
+
+    /**
+     * Prepare sequelize query for response
+     * @param {Object} sequelize query
+     * @returns {(Object|null)} sequelize query
+     */
+    static prepareResponse(query: ParsedQs) {
+        return (Object.keys(query).length === 0
+            && Object.getOwnPropertySymbols(query).length === 0) ? null : query;
+    }
+
+    /**
+     * Prepare integer response (limit and offset values)
+     * @param {string} string value
+     * @returns {(int|null)} integer value
+     */
+    static prepareIntegerQuery(query: string) {
+        const intQuery = parseInt(query, 10);
+        return (Number.isInteger(intQuery) && intQuery >= 0) ? intQuery : null;
+    }
+}

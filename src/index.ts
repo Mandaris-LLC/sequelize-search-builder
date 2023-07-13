@@ -5,4 +5,4 @@
  * MIT Licensed
  */
 
-module.exports = require('./src/search-builder');
+export { SearchBuilder } from './search-builder'
