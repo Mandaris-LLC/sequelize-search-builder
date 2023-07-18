@@ -41,8 +41,7 @@
   "dependencies": {
     "lodash": "^4.6.2",
     "qs": "^6.9.0",
-    "sequelize": "6.32.1",
-    "typescript": "^5.1.6"
+    "sequelize": "6.32.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.195",
@@ -52,11 +51,16 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-mocha": "^5.2.0",
+    "husky": "^8.0.0",
     "lodash.isequal": "^4.5.0",
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "pinst": "^3.0.0",
+    "typescript": "^5.1.6"
   },
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build"
+    "postinstall": "husky install",
+    "prepack": "pinst --disable",
+    "postpack": "pinst --enable"
   }
 }
