@@ -1,12 +1,22 @@
 import * as qs from 'qs';
 import { Config } from './config';
-import { ModelStatic, Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize';
 export declare class BuilderAbstract {
-    protected Model: ModelStatic<any>;
+    protected Model: {
+        sequelize: Sequelize;
+        rawAttributes: {
+            [key: string]: any;
+        };
+    };
     protected config: Config;
     protected request: qs.ParsedQs;
     protected sequelize: Sequelize;
-    constructor(Model: ModelStatic<any>, request?: qs.ParsedQs, config?: Partial<Config>);
+    constructor(Model: {
+        sequelize: Sequelize;
+        rawAttributes: {
+            [key: string]: any;
+        };
+    }, request?: qs.ParsedQs, config?: Partial<Config>);
     /**
      * Transform request to request object
      * @param {(Object|string)} request

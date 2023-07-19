@@ -1,14 +1,14 @@
 import * as qs from 'qs'
 import { merge } from 'lodash'
 import defaultConfig, { Config } from './config';
-import { ModelStatic, Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize';
 
 export class BuilderAbstract {
     protected config: Config;
     protected request: qs.ParsedQs;
     protected sequelize: Sequelize;
 
-    constructor(protected Model: ModelStatic<any>, request: qs.ParsedQs = {}, config: Partial<Config> = {}) {
+    constructor(protected Model: { sequelize: Sequelize, rawAttributes: { [key: string]: any } }, request: qs.ParsedQs = {}, config: Partial<Config> = {}) {
         if (new.target === BuilderAbstract) {
             throw new TypeError('Cannot construct BuilderAbstract instances directly');
         }
