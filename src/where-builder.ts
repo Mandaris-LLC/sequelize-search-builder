@@ -1,4 +1,4 @@
-import { AbstractDataTypeConstructor, Op } from "sequelize";
+import { Op } from "sequelize";
 import { BuilderAbstract } from "./builder-abstract";
 
 
@@ -8,7 +8,7 @@ export class WhereBuilder extends BuilderAbstract {
         const columnTypes: { [key: string]: string } = {};
 
         for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
-            columnTypes[attributeName] = (attribute.type as AbstractDataTypeConstructor).key;
+            columnTypes[attributeName] = (attribute.type as any).key;
         }
 
         return columnTypes;
