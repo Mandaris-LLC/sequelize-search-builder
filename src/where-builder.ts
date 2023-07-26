@@ -52,7 +52,7 @@ export class WhereBuilder extends BuilderAbstract {
 
     getPotentialUUIDColumns(columnTypes: { [key: string]: string }): string[] {
         return Object.entries(columnTypes)
-            .filter(([_, columnType]) => columnType.startsWith('UUID'))
+            .filter(([_, columnType]) => columnType?.startsWith('UUID'))
             .map(([columnName, type]) => columnName);
     }
 
