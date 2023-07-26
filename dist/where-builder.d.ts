@@ -12,5 +12,5 @@ export declare class WhereBuilder extends BuilderAbstract {
         [key: string]: string;
     }): string[];
     parseFilterValue(value: any, columnType: string): any;
-    parseValue(value: any, columnType: string): any;
+    parseValue(value: any, columnType: string, escape?: boolean): any;
 }

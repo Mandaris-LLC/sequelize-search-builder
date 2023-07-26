@@ -67,13 +67,13 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     case 'between':
                         return { [sequelize_1.Op.between]: [this.parseValue(filterValue[0], columnType), this.parseValue(filterValue[1], columnType)] };
                     case 'like':
-                        return { [sequelize_1.Op.like]: `%${this.parseValue(filterValue, columnType)}%` };
+                        return { [sequelize_1.Op.like]: `%${this.parseValue(filterValue, columnType, true)}%` };
                 }
             }
         }
         return this.parseValue(value, columnType);
     }
-    parseValue(value, columnType) {
+    parseValue(value, columnType, escape = false) {
         if (columnType === 'BOOLEAN') {
             return value === 'true';
         }
@@ -81,14 +81,14 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
             return Number(value);
         }
         else if (columnType === 'STRING') {
-            return this.sequelize.escape(value);
+            return escape ? this.sequelize.escape(value) : value;
         }
         else if (columnType === 'DATE') {
             return new Date(value);
         }
         else {
             // Handle other column types as needed
-            return this.sequelize.escape(value);
+            return escape ? this.sequelize.escape(value) : value;
         }
     }
 }
