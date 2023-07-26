@@ -36,6 +36,7 @@
     "LICENSE",
     "Readme.md",
     "index.js",
+    "postinstall.js",
     "src/",
     "config/"
   ],
@@ -60,7 +61,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "postinstall": "ls -l && node postinstall.js",
+    "postinstall": "node postinstall.js",
     "install-husky": "husky install"
   }
 }
