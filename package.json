@@ -60,7 +60,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "postinstall": "node postinstall.js",
+    "postinstall": "ls -l && node postinstall.js",
     "install-husky": "husky install"
   }
 }
