@@ -18,9 +18,12 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
         for (const [key, value] of Object.entries(request)) {
             if (key === '_q') {
                 const searchColumns = this.getSearchableColumns(columnTypes);
+                const uuidColumns = this.getPotentialUUIDColumns(columnTypes);
                 query[sequelize_1.Op.or] = searchColumns.map((column) => ({
                     [column]: { [sequelize_1.Op.like]: `%${this.escapeSearchQuery(value)}%` },
-                }));
+                })).concat(uuidColumns.map((column) => ({
+                    [column]: { [sequelize_1.Op.eq]: `${this.escapeSearchQuery(value)}` },
+                })));
             }
             const columnType = columnTypes[key];
             if (columnType)
@@ -35,7 +38,12 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
     getSearchableColumns(columnTypes) {
         return Object.entries(columnTypes)
             .filter(([_, columnType]) => columnType === 'STRING')
-            .map(([columnName, _]) => columnName);
+            .map(([columnName, type]) => columnName);
+    }
+    getPotentialUUIDColumns(columnTypes) {
+        return Object.entries(columnTypes)
+            .filter(([_, columnType]) => columnType.startsWith('UUID'))
+            .map(([columnName, type]) => columnName);
     }
     parseFilterValue(value, columnType) {
         if (typeof value === 'object' && value !== null) {

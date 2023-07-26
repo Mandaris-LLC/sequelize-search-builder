@@ -8,6 +8,9 @@ export declare class WhereBuilder extends BuilderAbstract {
     getSearchableColumns(columnTypes: {
         [key: string]: string;
     }): string[];
+    getPotentialUUIDColumns(columnTypes: {
+        [key: string]: string;
+    }): string[];
     parseFilterValue(value: any, columnType: string): any;
     parseValue(value: any, columnType: string): any;
 }

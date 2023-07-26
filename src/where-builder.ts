@@ -24,9 +24,12 @@ export class WhereBuilder extends BuilderAbstract {
         for (const [key, value] of Object.entries(request)) {
             if (key === '_q') {
                 const searchColumns = this.getSearchableColumns(columnTypes);
+                const uuidColumns = this.getPotentialUUIDColumns(columnTypes);
                 query[Op.or as any] = searchColumns.map((column) => ({
                     [column]: { [Op.like]: `%${this.escapeSearchQuery(value as string)}%` },
-                }));
+                })).concat(uuidColumns.map((column) => ({
+                    [column]: { [Op.eq]: `${this.escapeSearchQuery(value as string)}` },
+                })));
             }
             const columnType = columnTypes[key];
             if (columnType)
@@ -44,7 +47,13 @@ export class WhereBuilder extends BuilderAbstract {
     getSearchableColumns(columnTypes: { [key: string]: string }): string[] {
         return Object.entries(columnTypes)
             .filter(([_, columnType]) => columnType === 'STRING')
-            .map(([columnName, _]) => columnName);
+            .map(([columnName, type]) => columnName);
+    }
+
+    getPotentialUUIDColumns(columnTypes: { [key: string]: string }): string[] {
+        return Object.entries(columnTypes)
+            .filter(([_, columnType]) => columnType.startsWith('UUID'))
+            .map(([columnName, type]) => columnName);
     }
 
     parseFilterValue(value: any, columnType: string): any {
