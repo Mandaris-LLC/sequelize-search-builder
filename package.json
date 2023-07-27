@@ -35,10 +35,8 @@
   "files": [
     "LICENSE",
     "Readme.md",
-    "dist/*",
-    "postinstall.js",
-    "src/",
-    "config/"
+    "dist/",
+    "postinstall.js"
   ],
   "dependencies": {
     "lodash": "^4.6.2",
