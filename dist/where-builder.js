@@ -72,9 +72,9 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     case 'between':
                         return { [sequelize_1.Op.between]: [this.parseValue(filterValue[0], columnType), this.parseValue(filterValue[1], columnType)] };
                     case 'like':
-                        return { [sequelize_1.Op.like]: `%${this.parseValue(filterValue, columnType, true)}%` };
+                        return { [sequelize_1.Op.like]: `%${this.escapeSearchQuery(filterValue)}%` };
                     case 'contains':
-                        return { [sequelize_1.Op.like]: `%${this.parseValue(filterValue, columnType, true)}%` };
+                        return { [sequelize_1.Op.like]: `%${this.escapeSearchQuery(filterValue)}%` };
                 }
             }
         }
