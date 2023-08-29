@@ -76,6 +76,11 @@ export class WhereBuilder extends BuilderAbstract {
                         return { [Op.ne]: this.parseValue(filterValue, columnType) };
                     case 'eq':
                         return { [Op.eq]: this.parseValue(filterValue, columnType) };
+                    case 'in':
+                        if (Array.isArray(filterValue)) {
+                            return { [Op.in]: filterValue.map((value) => this.parseValue(value, columnType)) };
+                        }
+                        return { [Op.eq]: this.parseValue(filterValue, columnType) };
                     case 'between':
                         return { [Op.between]: [this.parseValue(filterValue[0], columnType), this.parseValue(filterValue[1], columnType)] };
                     case 'like':
