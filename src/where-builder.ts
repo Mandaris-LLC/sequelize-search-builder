@@ -85,6 +85,8 @@ export class WhereBuilder extends BuilderAbstract {
                         return { [Op.between]: [this.parseValue(filterValue[0], columnType), this.parseValue(filterValue[1], columnType)] };
                     case 'like':
                         return { [Op.like]: `%${this.parseValue(filterValue, columnType, true)}%` };
+                    case 'contains':
+                        return { [Op.like]: `%${this.parseValue(filterValue, columnType, true)}%` };
                 }
             }
         }
