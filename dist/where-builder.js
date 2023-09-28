@@ -45,7 +45,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
         const query = {};
         const columnTypes = this.extractColumnTypes();
         for (const [key, value] of Object.entries(request)) {
-            if (key === '_q') {
+            if (key === '_q' && value !== '') {
                 const numberVal = parseInt(value);
                 const searchColumns = this.getSearchableColumns(columnTypes);
                 const uuidColumns = this.getPotentialUUIDColumns(columnTypes);
