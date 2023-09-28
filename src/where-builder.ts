@@ -7,10 +7,43 @@ export class WhereBuilder extends BuilderAbstract {
     extractColumnTypes(): { [key: string]: string } {
         const columnTypes: { [key: string]: string } = {};
 
+        let options = {} as any;
+        const tableNames = {} as any;
+
+        tableNames[(this.Model as any).getTableName(options)] = true;
+
+        (this.Model as any)._injectScope(options);
+
+        if ('_conformOptions' in this.Model) {
+            (this.Model as any)._conformOptions(options, this.Model);
+        } else if ('_conformIncludes' in this.Model) {
+            (this.Model as any)._conformIncludes(options, this.Model);
+        }
+        (this.Model as any)._expandAttributes(options);
+        (this.Model as any)._expandIncludeAll(options);
+
+        if (options.include) {
+            options.hasJoin = true;
+            (this.Model as any)._validateIncludedElements(options, tableNames);
+        }
+
+        if (!options.attributes) {
+            options.attributes = Object.keys((this.Model as any).tableAttributes);
+        }
+
         for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
             columnTypes[attributeName] = (attribute.type as any).key;
         }
-
+        if (options.includeMap && this.config["filter-includes"]) {
+            Object.keys(options.includeMap).forEach((key) => {
+                const incl = options.includeMap[key];
+                for (const [attributeName, attribute] of Object.entries(incl.model.rawAttributes)) {
+                    if (incl.attributes.includes(attributeName)) {
+                        columnTypes[`$${key}.${attributeName}$`] = (attribute as any).type.key;
+                    }
+                }
+            })
+        }
         return columnTypes;
     }
 

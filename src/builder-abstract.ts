@@ -3,12 +3,17 @@ import { merge } from 'lodash'
 import defaultConfig, { Config } from './config';
 import { Sequelize } from 'sequelize';
 
+interface SeqModelLike {
+    sequelize: Sequelize,
+    rawAttributes: { [key: string]: any }
+}
+
 export class BuilderAbstract {
     protected config: Config;
     protected request: qs.ParsedQs;
     protected sequelize: Sequelize;
 
-    constructor(protected Model: { sequelize: Sequelize, rawAttributes: { [key: string]: any } }, request: qs.ParsedQs = {}, config: Partial<Config> = {}) {
+    constructor(protected Model: SeqModelLike, request: qs.ParsedQs = {}, config: Partial<Config> = {}) {
         if (new.target === BuilderAbstract) {
             throw new TypeError('Cannot construct BuilderAbstract instances directly');
         }

@@ -6,6 +6,7 @@ declare const defaultConfig: {
         limit: string;
         offset: string;
     };
+    'filter-includes': boolean;
     'default-limit': number;
 };
 export type Config = typeof defaultConfig;
@@ -17,6 +18,7 @@ export declare const config: {
         limit: string;
         offset: string;
     };
+    'filter-includes': boolean;
     'default-limit': number;
 };
 export default config;

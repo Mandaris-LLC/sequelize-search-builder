@@ -9,6 +9,8 @@ const defaultConfig = {
         offset: 'offset',
     },
 
+    'filter-includes': false,
+
     'default-limit': 10,
 };
 

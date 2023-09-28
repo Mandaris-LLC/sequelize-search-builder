@@ -9,6 +9,7 @@ const defaultConfig = {
         limit: 'limit',
         offset: 'offset',
     },
+    'filter-includes': false,
     'default-limit': 10,
 };
 exports.config = defaultConfig;
