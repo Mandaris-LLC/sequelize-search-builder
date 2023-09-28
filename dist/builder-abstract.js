@@ -12,7 +12,7 @@ class BuilderAbstract {
         }
         this.sequelize = Model.sequelize;
         this.request = BuilderAbstract.prepareRequest(request);
-        this.config = (0, lodash_1.merge)(config, config_1.default);
+        this.config = (0, lodash_1.merge)(config_1.default, config);
     }
     /**
      * Transform request to request object

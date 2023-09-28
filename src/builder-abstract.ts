@@ -19,7 +19,7 @@ export class BuilderAbstract {
         }
         this.sequelize = Model.sequelize!
         this.request = BuilderAbstract.prepareRequest(request);
-        this.config = merge(config, defaultConfig);
+        this.config = merge(defaultConfig, config);
     }
 
     /**
