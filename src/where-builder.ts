@@ -23,12 +23,16 @@ export class WhereBuilder extends BuilderAbstract {
 
         for (const [key, value] of Object.entries(request)) {
             if (key === '_q') {
+                const numberVal = parseInt(value as string)
                 const searchColumns = this.getSearchableColumns(columnTypes);
                 const uuidColumns = this.getPotentialUUIDColumns(columnTypes);
+                const numberColumns = this.getNumberColumns(columnTypes);
                 query[Op.or as any] = searchColumns.map((column) => ({
                     [column]: { [Op.like]: `%${this.escapeSearchQuery(value as string)}%` },
                 })).concat(uuidColumns.map((column) => ({
                     [column]: { [Op.eq]: `${this.escapeSearchQuery(value as string)}` },
+                }))).concat(Number.isNaN(numberVal) ? [] : numberColumns.map((column) => ({
+                    [column]: { [Op.eq]: `${parseInt(value as string)}` },
                 })));
             }
             const columnType = columnTypes[key];
@@ -47,6 +51,12 @@ export class WhereBuilder extends BuilderAbstract {
     getSearchableColumns(columnTypes: { [key: string]: string }): string[] {
         return Object.entries(columnTypes)
             .filter(([_, columnType]) => columnType === 'STRING')
+            .map(([columnName, type]) => columnName);
+    }
+
+    getNumberColumns(columnTypes: { [key: string]: string }): string[] {
+        return Object.entries(columnTypes)
+            .filter(([_, columnType]) => columnType === 'NUMBER' || columnType === 'INTEGER' || columnType === 'DECIMAL')
             .map(([columnName, type]) => columnName);
     }
 

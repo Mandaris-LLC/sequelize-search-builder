@@ -17,12 +17,16 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
         const columnTypes = this.extractColumnTypes();
         for (const [key, value] of Object.entries(request)) {
             if (key === '_q') {
+                const numberVal = parseInt(value);
                 const searchColumns = this.getSearchableColumns(columnTypes);
                 const uuidColumns = this.getPotentialUUIDColumns(columnTypes);
+                const numberColumns = this.getNumberColumns(columnTypes);
                 query[sequelize_1.Op.or] = searchColumns.map((column) => ({
                     [column]: { [sequelize_1.Op.like]: `%${this.escapeSearchQuery(value)}%` },
                 })).concat(uuidColumns.map((column) => ({
                     [column]: { [sequelize_1.Op.eq]: `${this.escapeSearchQuery(value)}` },
+                }))).concat(Number.isNaN(numberVal) ? [] : numberColumns.map((column) => ({
+                    [column]: { [sequelize_1.Op.eq]: `${parseInt(value)}` },
                 })));
             }
             const columnType = columnTypes[key];
@@ -38,6 +42,11 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
     getSearchableColumns(columnTypes) {
         return Object.entries(columnTypes)
             .filter(([_, columnType]) => columnType === 'STRING')
+            .map(([columnName, type]) => columnName);
+    }
+    getNumberColumns(columnTypes) {
+        return Object.entries(columnTypes)
+            .filter(([_, columnType]) => columnType === 'NUMBER' || columnType === 'INTEGER' || columnType === 'DECIMAL')
             .map(([columnName, type]) => columnName);
     }
     getPotentialUUIDColumns(columnTypes) {
