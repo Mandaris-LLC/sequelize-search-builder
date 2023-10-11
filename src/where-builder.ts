@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
 import { BuilderAbstract } from "./builder-abstract";
-import { SearchBuilder } from "./search-builder";
 import { findAllQueryAsSQL } from "./sql-generator";
+import { ParsedQs } from "qs";
 
 type IncludeMap = { [key: string]: any }
 
@@ -61,14 +61,18 @@ export class WhereBuilder extends BuilderAbstract {
                 }))).concat(Number.isNaN(numberVal) ? [] : numberColumns.map((column) => ({
                     [column]: { [Op.eq]: `${parseInt(value as string)}` },
                 })));
-            }
-            const columnType = columnTypes[key];
-            if (columnType) {
-                query[key] = this.parseFilterValue(value, columnType);
-            } else if (this.config["filter-includes"]) {
-                const result = this.applySubQuery(key, includeMap, value)
-                if (result) {
-                    query[result.col] = result.filter;
+            } else if (key == 'or' || key == 'and') {
+                const builder = new WhereBuilder(this.Model, value as ParsedQs);
+                query[(key == 'or' ? Op.or : Op.and as any)] = builder.getQuery()
+            } else {
+                const columnType = columnTypes[key];
+                if (columnType) {
+                    query[key] = this.parseFilterValue(value, columnType);
+                } else if (this.config["filter-includes"]) {
+                    const result = this.applySubQuery(key, includeMap, value)
+                    if (result) {
+                        query[result.col] = result.filter;
+                    }
                 }
             }
         }

@@ -50,14 +50,20 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     [column]: { [sequelize_1.Op.eq]: `${parseInt(value)}` },
                 })));
             }
-            const columnType = columnTypes[key];
-            if (columnType) {
-                query[key] = this.parseFilterValue(value, columnType);
+            else if (key == 'or' || key == 'and') {
+                const builder = new WhereBuilder(this.Model, value);
+                query[(key == 'or' ? sequelize_1.Op.or : sequelize_1.Op.and)] = builder.getQuery();
             }
-            else if (this.config["filter-includes"]) {
-                const result = this.applySubQuery(key, includeMap, value);
-                if (result) {
-                    query[result.col] = result.filter;
+            else {
+                const columnType = columnTypes[key];
+                if (columnType) {
+                    query[key] = this.parseFilterValue(value, columnType);
+                }
+                else if (this.config["filter-includes"]) {
+                    const result = this.applySubQuery(key, includeMap, value);
+                    if (result) {
+                        query[result.col] = result.filter;
+                    }
                 }
             }
         }
