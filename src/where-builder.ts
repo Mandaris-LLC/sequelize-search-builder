@@ -1,10 +1,13 @@
 import { Op } from "sequelize";
 import { BuilderAbstract } from "./builder-abstract";
+import { SearchBuilder } from "./search-builder";
+import { findAllQueryAsSQL } from "./sql-generator";
 
+type IncludeMap = { [key: string]: any }
 
 export class WhereBuilder extends BuilderAbstract {
 
-    extractColumnTypes(): { [key: string]: string } {
+    extractColumnTypes(): { columnTypes: { [key: string]: string }, includeMap: IncludeMap } {
         const columnTypes: { [key: string]: string } = {};
 
         let options = {} as any;
@@ -26,7 +29,6 @@ export class WhereBuilder extends BuilderAbstract {
             options.hasJoin = true;
             (this.Model as any)._validateIncludedElements(options, tableNames);
         }
-
         if (!options.attributes) {
             options.attributes = Object.keys((this.Model as any).tableAttributes);
         }
@@ -34,24 +36,16 @@ export class WhereBuilder extends BuilderAbstract {
         for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
             columnTypes[attributeName] = (attribute.type as any).key;
         }
-        if (options.includeMap && this.config["filter-includes"]) {
-            Object.keys(options.includeMap).forEach((key) => {
-                const incl = options.includeMap[key];
-                for (const [attributeName, attribute] of Object.entries(incl.model.rawAttributes)) {
-                    if (incl.attributes.includes(attributeName)) {
-                        columnTypes[`$${key}.${attributeName}$`] = (attribute as any).type.key;
-                    }
-                }
-            })
-        }
-        return columnTypes;
+
+        const includeMap = options.includeMap
+        return { columnTypes, includeMap };
     }
 
     getQuery() {
         const { request } = this;
         const query: { [key: string]: any } = {};
 
-        const columnTypes = this.extractColumnTypes();
+        const { columnTypes, includeMap } = this.extractColumnTypes();
 
 
         for (const [key, value] of Object.entries(request)) {
@@ -69,11 +63,41 @@ export class WhereBuilder extends BuilderAbstract {
                 })));
             }
             const columnType = columnTypes[key];
-            if (columnType)
+            if (columnType) {
                 query[key] = this.parseFilterValue(value, columnType);
+            } else if (this.config["filter-includes"]) {
+                const result = this.applySubQuery(key, includeMap, value)
+                if (result) {
+                    query[result.col] = result.filter;
+                }
+            }
         }
 
         return query as {}
+    }
+
+    applySubQuery(key: string, map: IncludeMap, value: any): undefined | { col: string, filter: any } {
+        if (!key.includes('.')) {
+            return undefined
+        }
+        const [model, ...rest] = key.split('.')
+        if (map[model] && map[model].association.source.tableName == (this.Model as any).tableName) {
+            if (rest.length > 1) {
+                if (map[model].includeMap)
+                    return this.applySubQuery(rest.join('.'), map[model].includeMap, value);
+                return undefined;
+            }
+            else {
+                const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
+                const subQuery = findAllQueryAsSQL(map[model].model, { where: builder.getQuery(), attributes: ['id'] })
+                return {
+                    col: map[model].association.foreignKey,
+                    filter: {
+                        [Op.in]: `(${subQuery})`
+                    }
+                };
+            }
+        }
     }
 
     escapeSearchQuery(query: string): string {

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WhereBuilder = void 0;
 const sequelize_1 = require("sequelize");
 const builder_abstract_1 = require("./builder-abstract");
+const sql_generator_1 = require("./sql-generator");
 class WhereBuilder extends builder_abstract_1.BuilderAbstract {
     extractColumnTypes() {
         const columnTypes = {};
@@ -28,22 +29,13 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
         for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
             columnTypes[attributeName] = attribute.type.key;
         }
-        if (options.includeMap && this.config["filter-includes"]) {
-            Object.keys(options.includeMap).forEach((key) => {
-                const incl = options.includeMap[key];
-                for (const [attributeName, attribute] of Object.entries(incl.model.rawAttributes)) {
-                    if (incl.attributes.includes(attributeName)) {
-                        columnTypes[`$${key}.${attributeName}$`] = attribute.type.key;
-                    }
-                }
-            });
-        }
-        return columnTypes;
+        const includeMap = options.includeMap;
+        return { columnTypes, includeMap };
     }
     getQuery() {
         const { request } = this;
         const query = {};
-        const columnTypes = this.extractColumnTypes();
+        const { columnTypes, includeMap } = this.extractColumnTypes();
         for (const [key, value] of Object.entries(request)) {
             if (key === '_q' && value !== '') {
                 const numberVal = parseInt(value);
@@ -59,10 +51,40 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                 })));
             }
             const columnType = columnTypes[key];
-            if (columnType)
+            if (columnType) {
                 query[key] = this.parseFilterValue(value, columnType);
+            }
+            else if (this.config["filter-includes"]) {
+                const result = this.applySubQuery(key, includeMap, value);
+                if (result) {
+                    query[result.col] = result.filter;
+                }
+            }
         }
         return query;
+    }
+    applySubQuery(key, map, value) {
+        if (!key.includes('.')) {
+            return undefined;
+        }
+        const [model, ...rest] = key.split('.');
+        if (map[model] && map[model].association.source.tableName == this.Model.tableName) {
+            if (rest.length > 1) {
+                if (map[model].includeMap)
+                    return this.applySubQuery(rest.join('.'), map[model].includeMap, value);
+                return undefined;
+            }
+            else {
+                const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
+                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, { where: builder.getQuery(), attributes: ['id'] });
+                return {
+                    col: map[model].association.foreignKey,
+                    filter: {
+                        [sequelize_1.Op.in]: `(${subQuery})`
+                    }
+                };
+            }
+        }
     }
     escapeSearchQuery(query) {
         // Escape special characters
