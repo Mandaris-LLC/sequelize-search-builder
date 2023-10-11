@@ -93,7 +93,7 @@ export class WhereBuilder extends BuilderAbstract {
                 return {
                     col: map[model].association.foreignKey,
                     filter: {
-                        [Op.in]: `(${subQuery})`
+                        [Op.in]: this.sequelize.literal(`(${subQuery})`)
                     }
                 };
             }
