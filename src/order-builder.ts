@@ -7,7 +7,7 @@ export class OrderBuilder extends BuilderAbstract {
 
         Object.keys(request).forEach((key) => {
             const value = key.split('.');
-            value.push(request[key] as string);
+            value.push((request[key] as string).trim());
             query.push(value);
         });
 
