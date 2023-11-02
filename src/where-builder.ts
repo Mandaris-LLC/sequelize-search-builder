@@ -61,6 +61,20 @@ export class WhereBuilder extends BuilderAbstract {
                 }))).concat(Number.isNaN(numberVal) ? [] : numberColumns.map((column) => ({
                     [column]: { [Op.eq]: `${parseInt(value as string)}` },
                 })));
+
+
+                if (this.config["filter-includes"]) {
+                    for (const model in includeMap) {
+                        const builder = new WhereBuilder(includeMap[model].model, request);
+                        const subQuery = findAllQueryAsSQL(includeMap[model].model, { where: builder.getQuery(), attributes: ['id'] })
+                        query[Op.or as any].push({
+                            [includeMap[model].association.foreignKey]: {
+                                [Op.in]: this.sequelize.literal(`(${subQuery})`)
+                            }
+                        })
+                    }
+                }
+
             } else if (key == 'or' || key == 'and') {
                 const builder = new WhereBuilder(this.Model, value as ParsedQs);
                 query[(key == 'or' ? Op.or : Op.and as any)] = builder.getQuery()
