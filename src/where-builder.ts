@@ -65,14 +65,23 @@ export class WhereBuilder extends BuilderAbstract {
 
                 if (this.config["filter-includes"]) {
                     for (const model in includeMap) {
-                        if (!includeMap[model].association.through && includeMap[model].association.associationType !== 'HasMany') {
+                        if (!includeMap[model].association.through) {
                             const builder = new WhereBuilder(includeMap[model].model, request);
-                            const subQuery = findAllQueryAsSQL(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'] })
-                            query[Op.or as any].push({
-                                [includeMap[model].association.foreignKey]: {
-                                    [Op.in]: this.sequelize.literal(`(${subQuery})`)
-                                }
-                            })
+                            if (includeMap[model].association.associationType !== 'HasMany') {
+                                const subQuery = findAllQueryAsSQL(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'] })
+                                query[Op.or as any].push({
+                                    [includeMap[model].association.foreignKey]: {
+                                        [Op.in]: this.sequelize.literal(`(${subQuery})`)
+                                    }
+                                })
+                            } else {
+                                const subQuery = findAllQueryAsSQL(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: [includeMap[model].association.foreignKey] })
+                                query[Op.or as any].push({
+                                    [includeMap[model].association.sourceKey]: {
+                                        [Op.in]: this.sequelize.literal(`(${subQuery})`)
+                                    }
+                                })
+                            }
                         }
                     }
                 }

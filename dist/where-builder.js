@@ -51,14 +51,24 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                 })));
                 if (this.config["filter-includes"]) {
                     for (const model in includeMap) {
-                        if (!includeMap[model].association.through && includeMap[model].association.associationType !== 'HasMany') {
+                        if (!includeMap[model].association.through) {
                             const builder = new WhereBuilder(includeMap[model].model, request);
-                            const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'] });
-                            query[sequelize_1.Op.or].push({
-                                [includeMap[model].association.foreignKey]: {
-                                    [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
-                                }
-                            });
+                            if (includeMap[model].association.associationType !== 'HasMany') {
+                                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'] });
+                                query[sequelize_1.Op.or].push({
+                                    [includeMap[model].association.foreignKey]: {
+                                        [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
+                                    }
+                                });
+                            }
+                            else {
+                                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: [includeMap[model].association.foreignKey] });
+                                query[sequelize_1.Op.or].push({
+                                    [includeMap[model].association.sourceKey]: {
+                                        [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
+                                    }
+                                });
+                            }
                         }
                     }
                 }
