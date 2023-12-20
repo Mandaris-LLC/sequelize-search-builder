@@ -141,16 +141,22 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                 const operator = operators[0];
                 const filterValue = value[operator];
                 switch (operator) {
+                    case ">":
                     case 'gt':
                         return { [sequelize_1.Op.gt]: this.parseValue(filterValue, columnType) };
+                    case '<':
                     case 'lt':
                         return { [sequelize_1.Op.lt]: this.parseValue(filterValue, columnType) };
+                    case '>=':
                     case 'gte':
                         return { [sequelize_1.Op.gte]: this.parseValue(filterValue, columnType) };
+                    case '<=':
                     case 'lte':
                         return { [sequelize_1.Op.lte]: this.parseValue(filterValue, columnType) };
+                    case '<>':
                     case 'ne':
                         return { [sequelize_1.Op.ne]: this.parseValue(filterValue, columnType) };
+                    case '=':
                     case 'eq':
                         return { [sequelize_1.Op.eq]: this.parseValue(filterValue, columnType) };
                     case 'in':
@@ -164,6 +170,12 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         return { [sequelize_1.Op.like]: `%${this.escapeSearchQuery(filterValue)}%` };
                     case 'contains':
                         return { [sequelize_1.Op.like]: `%${this.escapeSearchQuery(filterValue)}%` };
+                    case 'startswith':
+                        return { [sequelize_1.Op.like]: `${this.escapeSearchQuery(filterValue)}%` };
+                    case 'endswith':
+                        return { [sequelize_1.Op.like]: `%${this.escapeSearchQuery(filterValue)}%` };
+                    case 'notcontains':
+                        return { [sequelize_1.Op.notLike]: `%${this.escapeSearchQuery(filterValue)}%` };
                 }
             }
         }

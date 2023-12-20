@@ -160,16 +160,22 @@ export class WhereBuilder extends BuilderAbstract {
                 const filterValue = value[operator];
 
                 switch (operator) {
+                    case ">":
                     case 'gt':
                         return { [Op.gt]: this.parseValue(filterValue, columnType) };
+                    case '<':
                     case 'lt':
                         return { [Op.lt]: this.parseValue(filterValue, columnType) };
+                    case '>=':
                     case 'gte':
                         return { [Op.gte]: this.parseValue(filterValue, columnType) };
+                    case '<=':
                     case 'lte':
                         return { [Op.lte]: this.parseValue(filterValue, columnType) };
+                    case '<>':
                     case 'ne':
                         return { [Op.ne]: this.parseValue(filterValue, columnType) };
+                    case '=':
                     case 'eq':
                         return { [Op.eq]: this.parseValue(filterValue, columnType) };
                     case 'in':
@@ -183,10 +189,15 @@ export class WhereBuilder extends BuilderAbstract {
                         return { [Op.like]: `%${this.escapeSearchQuery(filterValue)}%` };
                     case 'contains':
                         return { [Op.like]: `%${this.escapeSearchQuery(filterValue)}%` };
+                    case 'startswith':
+                        return { [Op.like]: `${this.escapeSearchQuery(filterValue)}%` };
+                    case 'endswith':
+                        return { [Op.like]: `%${this.escapeSearchQuery(filterValue)}%` };
+                    case 'notcontains':
+                        return { [Op.notLike]: `%${this.escapeSearchQuery(filterValue)}%` };
                 }
             }
         }
-
         return this.parseValue(value, columnType);
     }
 
