@@ -89,6 +89,16 @@ export class WhereBuilder extends BuilderAbstract {
             } else if (key == 'or' || key == 'and') {
                 const builder = new WhereBuilder(this.Model, value as ParsedQs);
                 query[(key == 'or' ? Op.or : Op.and as any)] = builder.getQuery()
+                if (Array.isArray(value)) {
+                    query[(key == 'or' ? Op.or : Op.and as any)] = [];
+                    value.forEach((value) => {
+                        const builder = new WhereBuilder(this.Model, value as ParsedQs);
+                        query[(key == 'or' ? Op.or : Op.and as any)].push(builder.getQuery());
+                    })
+                } else {
+                    const builder = new WhereBuilder(this.Model, value as ParsedQs);
+                    query[(key == 'or' ? Op.or : Op.and as any)] = builder.getQuery()
+                }
             } else {
                 const columnType = columnTypes[key];
                 if (columnType) {

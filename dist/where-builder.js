@@ -76,6 +76,17 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
             else if (key == 'or' || key == 'and') {
                 const builder = new WhereBuilder(this.Model, value);
                 query[(key == 'or' ? sequelize_1.Op.or : sequelize_1.Op.and)] = builder.getQuery();
+                if (Array.isArray(value)) {
+                    query[(key == 'or' ? sequelize_1.Op.or : sequelize_1.Op.and)] = [];
+                    value.forEach((value) => {
+                        const builder = new WhereBuilder(this.Model, value);
+                        query[(key == 'or' ? sequelize_1.Op.or : sequelize_1.Op.and)].push(builder.getQuery());
+                    });
+                }
+                else {
+                    const builder = new WhereBuilder(this.Model, value);
+                    query[(key == 'or' ? sequelize_1.Op.or : sequelize_1.Op.and)] = builder.getQuery();
+                }
             }
             else {
                 const columnType = columnTypes[key];
