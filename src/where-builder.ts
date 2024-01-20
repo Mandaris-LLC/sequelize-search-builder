@@ -185,6 +185,16 @@ export class WhereBuilder extends BuilderAbstract {
                     case '<>':
                     case 'ne':
                         return { [Op.ne]: this.parseValue(filterValue, columnType) };
+                    case 'is':
+                        if (filterValue === 'null') {
+                            return { [Op.is]: null };
+                        }
+                        break;
+                    case 'not':
+                        if (filterValue === 'null') {
+                            return { [Op.not]: null };
+                        }
+                        break;
                     case '=':
                     case 'eq':
                         return { [Op.eq]: this.parseValue(filterValue, columnType) };

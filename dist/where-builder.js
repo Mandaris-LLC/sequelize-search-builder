@@ -167,6 +167,16 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     case '<>':
                     case 'ne':
                         return { [sequelize_1.Op.ne]: this.parseValue(filterValue, columnType) };
+                    case 'is':
+                        if (filterValue === 'null') {
+                            return { [sequelize_1.Op.is]: null };
+                        }
+                        break;
+                    case 'not':
+                        if (filterValue === 'null') {
+                            return { [sequelize_1.Op.not]: null };
+                        }
+                        break;
                     case '=':
                     case 'eq':
                         return { [sequelize_1.Op.eq]: this.parseValue(filterValue, columnType) };
