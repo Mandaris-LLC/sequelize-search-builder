@@ -39,7 +39,11 @@ class SearchBuilder extends builder_abstract_1.BuilderAbstract {
      * @returns {(int|null)} limit value
      */
     getLimitQuery() {
-        return SearchBuilder.prepareIntegerQuery(this.request[this.config.fields.limit]) || this.config['default-limit'] || null;
+        const limit = SearchBuilder.prepareIntegerQuery(this.request[this.config.fields.limit]);
+        if (limit === -1) {
+            return null;
+        }
+        return limit || this.config['default-limit'] || null;
     }
     /**
      * Get string with offset value

@@ -201,6 +201,8 @@ export class WhereBuilder extends BuilderAbstract {
                     case 'in':
                         if (Array.isArray(filterValue)) {
                             return { [Op.in]: filterValue.map((value) => this.parseValue(value, columnType)) };
+                        } else if (typeof filterValue === 'object') {
+                            return { [Op.in]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
                         }
                         return { [Op.eq]: this.parseValue(filterValue, columnType) };
                     case 'between':

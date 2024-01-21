@@ -42,7 +42,11 @@ export class SearchBuilder extends BuilderAbstract {
      * @returns {(int|null)} limit value
      */
     getLimitQuery() {
-        return SearchBuilder.prepareIntegerQuery(this.request[this.config.fields.limit] as string) || this.config['default-limit'] || null;
+        const limit = SearchBuilder.prepareIntegerQuery(this.request[this.config.fields.limit] as string)
+        if (limit === -1) {
+            return null
+        }
+        return limit || this.config['default-limit'] || null;
     }
 
     /**
