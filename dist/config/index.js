@@ -8,6 +8,7 @@ const defaultConfig = {
         order: 'order',
         limit: 'limit',
         offset: 'offset',
+        loadingAll: 'isLoadingAll'
     },
     'filter-includes': false,
     'default-limit': 10,

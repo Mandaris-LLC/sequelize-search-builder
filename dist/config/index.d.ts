@@ -5,6 +5,7 @@ declare const defaultConfig: {
         order: string;
         limit: string;
         offset: string;
+        loadingAll: string;
     };
     'filter-includes': boolean;
     'default-limit': number;
@@ -17,6 +18,7 @@ export declare const config: {
         order: string;
         limit: string;
         offset: string;
+        loadingAll: string;
     };
     'filter-includes': boolean;
     'default-limit': number;

@@ -39,6 +39,9 @@ class SearchBuilder extends builder_abstract_1.BuilderAbstract {
      * @returns {(int|null)} limit value
      */
     getLimitQuery() {
+        if (this.request[this.config.fields.loadingAll]) {
+            return null;
+        }
         const limit = SearchBuilder.prepareIntegerQuery(this.request[this.config.fields.limit]);
         if (limit === -1) {
             return null;

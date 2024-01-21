@@ -42,6 +42,9 @@ export class SearchBuilder extends BuilderAbstract {
      * @returns {(int|null)} limit value
      */
     getLimitQuery() {
+        if (this.request[this.config.fields.loadingAll]) {
+            return null
+        }
         const limit = SearchBuilder.prepareIntegerQuery(this.request[this.config.fields.limit] as string)
         if (limit === -1) {
             return null
