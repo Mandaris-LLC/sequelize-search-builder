@@ -8,7 +8,7 @@ class SummaryBuilder extends builder_abstract_1.BuilderAbstract {
         const summaries = request['totalSummary'];
         return summaries?.reduce((prev, summary) => {
             prev[summary.selector] = {
-                field: summary.selector,
+                field: `${this.Model.getTableName()}.${summary.selector}`,
                 function: summary.summaryType,
             };
             return prev;
