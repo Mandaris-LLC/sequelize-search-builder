@@ -6,7 +6,7 @@ import { Sequelize } from 'sequelize';
 interface SeqModelLike {
     sequelize: Sequelize,
     rawAttributes: { [key: string]: any }
-    getTableName(): { tableName: string; schema: string; delimiter: string; };
+    getTableName(): string | { tableName: string; schema: string; delimiter: string; };
 }
 
 export class BuilderAbstract {

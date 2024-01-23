@@ -6,7 +6,7 @@ interface SeqModelLike {
     rawAttributes: {
         [key: string]: any;
     };
-    getTableName(): {
+    getTableName(): string | {
         tableName: string;
         schema: string;
         delimiter: string;
