@@ -7,9 +7,10 @@ export class SummaryBuilder extends BuilderAbstract {
 
         return summaries?.reduce((prev, summary) => {
             prev[summary.selector] = {
-                attributes: [[this.sequelize.fn(summary.summaryType, this.sequelize.col(summary.selector)), `summary_${summary.selector}`]]
+                field: summary.selector,
+                function: summary.summaryType,
             }
             return prev;
-        }, {} as { [key: string]: { attributes: any } })
+        }, {} as { [key: string]: { field: string, function: string } })
     }
 }

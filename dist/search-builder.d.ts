@@ -19,7 +19,8 @@ export declare class SearchBuilder extends BuilderAbstract {
     getQueryByType(type: 'filter' | 'order'): any;
     getSummaryQueries(): {
         [key: string]: {
-            attributes: any;
+            field: string;
+            function: string;
         };
     };
     /**

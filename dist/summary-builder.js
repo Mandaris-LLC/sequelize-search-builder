@@ -8,7 +8,8 @@ class SummaryBuilder extends builder_abstract_1.BuilderAbstract {
         const summaries = request['totalSummary'];
         return summaries?.reduce((prev, summary) => {
             prev[summary.selector] = {
-                attributes: [[this.sequelize.fn(summary.summaryType, this.sequelize.col(summary.selector)), `summary_${summary.selector}`]]
+                field: summary.selector,
+                function: summary.summaryType,
             };
             return prev;
         }, {});
