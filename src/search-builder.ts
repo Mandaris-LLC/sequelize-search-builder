@@ -2,6 +2,7 @@ import { ParsedQs } from "qs";
 import { BuilderAbstract } from "./builder-abstract";
 import { OrderBuilder } from "./order-builder";
 import { WhereBuilder } from "./where-builder";
+import { SummaryBuilder } from "./summary-builder";
 
 const constructors = {
     filter: WhereBuilder,
@@ -35,6 +36,11 @@ export class SearchBuilder extends BuilderAbstract {
         return SearchBuilder
             .prepareResponse(new constructors[type](this.Model, request, this.config)
                 .getQuery()) as any;
+    }
+
+    getSummaryQueries() {
+        const summaryBuilder = new SummaryBuilder(this.Model, this.request, this.config)
+        return summaryBuilder.getQuery()
     }
 
     /**

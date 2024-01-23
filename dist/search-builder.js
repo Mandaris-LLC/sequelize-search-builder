@@ -4,6 +4,7 @@ exports.SearchBuilder = void 0;
 const builder_abstract_1 = require("./builder-abstract");
 const order_builder_1 = require("./order-builder");
 const where_builder_1 = require("./where-builder");
+const summary_builder_1 = require("./summary-builder");
 const constructors = {
     filter: where_builder_1.WhereBuilder,
     order: order_builder_1.OrderBuilder,
@@ -33,6 +34,10 @@ class SearchBuilder extends builder_abstract_1.BuilderAbstract {
         return SearchBuilder
             .prepareResponse(new constructors[type](this.Model, request, this.config)
             .getQuery());
+    }
+    getSummaryQueries() {
+        const summaryBuilder = new summary_builder_1.SummaryBuilder(this.Model, this.request, this.config);
+        return summaryBuilder.getQuery();
     }
     /**
      * Get string with limit value

@@ -17,6 +17,11 @@ export declare class SearchBuilder extends BuilderAbstract {
      * @returns {(Object|null)} sequelize query
      */
     getQueryByType(type: 'filter' | 'order'): any;
+    getSummaryQueries(): {
+        [key: string]: {
+            attributes: any;
+        };
+    };
     /**
      * Get string with limit value
      * @returns {(int|null)} limit value
