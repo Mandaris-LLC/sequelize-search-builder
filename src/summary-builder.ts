@@ -1,5 +1,4 @@
 import { BuilderAbstract } from "./builder-abstract";
-import { fn, col } from 'sequelize'
 
 export class SummaryBuilder extends BuilderAbstract {
     getQuery() {
@@ -8,7 +7,7 @@ export class SummaryBuilder extends BuilderAbstract {
 
         return summaries?.reduce((prev, summary) => {
             prev[summary.selector] = {
-                attributes: [[fn(summary.summaryType, col(summary.selector)), `summary_${summary.selector}`]]
+                attributes: [[this.sequelize.fn(summary.summaryType, this.sequelize.col(summary.selector)), `summary_${summary.selector}`]]
             }
             return prev;
         }, {} as { [key: string]: { attributes: any } })
