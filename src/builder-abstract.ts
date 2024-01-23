@@ -7,6 +7,7 @@ interface SeqModelLike {
     sequelize: Sequelize,
     rawAttributes: { [key: string]: any }
     getTableName(): string | { tableName: string; schema: string; delimiter: string; };
+    name: string;
 }
 
 export class BuilderAbstract {

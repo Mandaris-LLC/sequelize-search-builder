@@ -11,6 +11,7 @@ interface SeqModelLike {
         schema: string;
         delimiter: string;
     };
+    name: string;
 }
 export declare class BuilderAbstract {
     protected Model: SeqModelLike;

@@ -6,7 +6,7 @@ export class SummaryBuilder extends BuilderAbstract {
         const summaries = request['totalSummary'] as { selector: string, summaryType: 'sum' | 'count' }[]
 
         return summaries?.reduce((prev, summary) => {
-            const name = this.Model.getTableName()
+            const name = this.Model.name
             prev[summary.selector] = {
                 field: `${typeof name === 'string' ? name : name.tableName}.${summary.selector}`,
                 function: summary.summaryType,
