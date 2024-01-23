@@ -7,7 +7,7 @@ export class SummaryBuilder extends BuilderAbstract {
 
         return summaries?.reduce((prev, summary) => {
             prev[summary.selector] = {
-                field: `${this.Model.getTableName()}.${summary.selector}`,
+                field: `${this.Model.getTableName().tableName}.${summary.selector}`,
                 function: summary.summaryType,
             }
             return prev;

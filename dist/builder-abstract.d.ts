@@ -6,7 +6,11 @@ interface SeqModelLike {
     rawAttributes: {
         [key: string]: any;
     };
-    getTableName(): string;
+    getTableName(): {
+        tableName: string;
+        schema: string;
+        delimiter: string;
+    };
 }
 export declare class BuilderAbstract {
     protected Model: SeqModelLike;
