@@ -8,7 +8,7 @@ export class SummaryBuilder extends BuilderAbstract {
         return summaries?.reduce((prev, summary) => {
             const name = this.Model.name
             prev[summary.selector] = {
-                field: `${typeof name === 'string' ? name : name.tableName}.${summary.selector}`,
+                field: `${name}.${summary.selector}`,
                 function: summary.summaryType,
             }
             return prev;
