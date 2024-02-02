@@ -169,7 +169,7 @@ export class WhereBuilder extends BuilderAbstract {
                 if (arrayMatch && arrayMatch.length > 1) { // sometimes qs doesnt parse the array brackets correct
                     operator = arrayMatch[1]
                 }
-                const filterValue = value[operator];
+                const filterValue = value[operators[0]];
 
                 switch (operator) {
                     case ">":
