@@ -5,6 +5,16 @@ import { ParsedQs } from "qs";
 
 type IncludeMap = { [key: string]: any }
 
+function isNumber(num: string | number) {
+    if (typeof num === 'number') {
+        return num - num === 0;
+    }
+    if (typeof num === 'string' && num.trim() !== '') {
+        return Number.isFinite ? Number.isFinite(+num) : isFinite(+num);
+    }
+    return false;
+};
+
 export class WhereBuilder extends BuilderAbstract {
 
     extractColumnTypes(): { columnTypes: { [key: string]: string }, includeMap: IncludeMap } {
@@ -50,7 +60,6 @@ export class WhereBuilder extends BuilderAbstract {
 
         for (const [key, value] of Object.entries(request)) {
             if (key === '_q' && value !== '') {
-                const numberVal = parseInt(value as string)
                 const searchColumns = this.getSearchableColumns(columnTypes);
                 const uuidColumns = this.getPotentialUUIDColumns(columnTypes);
                 const numberColumns = this.getNumberColumns(columnTypes);
@@ -58,8 +67,8 @@ export class WhereBuilder extends BuilderAbstract {
                     [column]: { [Op.like]: `%${this.escapeSearchQuery(value as string)}%` },
                 })).concat(uuidColumns.map((column) => ({
                     [column]: { [Op.eq]: `${this.escapeSearchQuery(value as string)}` },
-                }))).concat(Number.isNaN(numberVal) ? [] : numberColumns.map((column) => ({
-                    [column]: { [Op.eq]: `${parseInt(value as string)}` },
+                }))).concat(isNumber(value as string) ? [] : numberColumns.map((column) => ({
+                    [column]: { [Op.eq]: `${value}` },
                 })));
 
 

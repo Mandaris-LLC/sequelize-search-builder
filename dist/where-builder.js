@@ -4,6 +4,16 @@ exports.WhereBuilder = void 0;
 const sequelize_1 = require("sequelize");
 const builder_abstract_1 = require("./builder-abstract");
 const sql_generator_1 = require("./sql-generator");
+function isNumber(num) {
+    if (typeof num === 'number') {
+        return num - num === 0;
+    }
+    if (typeof num === 'string' && num.trim() !== '') {
+        return Number.isFinite ? Number.isFinite(+num) : isFinite(+num);
+    }
+    return false;
+}
+;
 class WhereBuilder extends builder_abstract_1.BuilderAbstract {
     extractColumnTypes() {
         const columnTypes = {};
@@ -38,7 +48,6 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
         const { columnTypes, includeMap } = this.extractColumnTypes();
         for (const [key, value] of Object.entries(request)) {
             if (key === '_q' && value !== '') {
-                const numberVal = parseInt(value);
                 const searchColumns = this.getSearchableColumns(columnTypes);
                 const uuidColumns = this.getPotentialUUIDColumns(columnTypes);
                 const numberColumns = this.getNumberColumns(columnTypes);
@@ -46,8 +55,8 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     [column]: { [sequelize_1.Op.like]: `%${this.escapeSearchQuery(value)}%` },
                 })).concat(uuidColumns.map((column) => ({
                     [column]: { [sequelize_1.Op.eq]: `${this.escapeSearchQuery(value)}` },
-                }))).concat(Number.isNaN(numberVal) ? [] : numberColumns.map((column) => ({
-                    [column]: { [sequelize_1.Op.eq]: `${parseInt(value)}` },
+                }))).concat(isNumber(value) ? [] : numberColumns.map((column) => ({
+                    [column]: { [sequelize_1.Op.eq]: `${value}` },
                 })));
                 if (this.config["filter-includes"]) {
                     for (const model in includeMap) {
