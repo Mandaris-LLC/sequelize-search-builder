@@ -147,7 +147,11 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
         if (typeof value === 'object' && value !== null) {
             const operators = Object.keys(value);
             if (operators.length === 1) {
-                const operator = operators[0];
+                let operator = operators[0];
+                const arrayMatch = operator.match(/\[(.*)\]/);
+                if (arrayMatch && arrayMatch.length > 1) { // sometimes qs doesnt parse the array brackets correct
+                    operator = arrayMatch[1];
+                }
                 const filterValue = value[operator];
                 switch (operator) {
                     case ">":
