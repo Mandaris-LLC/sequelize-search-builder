@@ -5,7 +5,7 @@ export class AttributeBuilder extends BuilderAbstract {
     getAttributes() {
         const { request } = this;
         const dataFields = request['dataField'] as string[] | undefined
-
-        return dataFields
+        const normalized = dataFields ? Array.isArray(dataFields) ? dataFields : [dataFields] : undefined
+        return normalized
     }
 }

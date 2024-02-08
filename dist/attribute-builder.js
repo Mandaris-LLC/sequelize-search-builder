@@ -6,7 +6,8 @@ class AttributeBuilder extends builder_abstract_1.BuilderAbstract {
     getAttributes() {
         const { request } = this;
         const dataFields = request['dataField'];
-        return dataFields;
+        const normalized = dataFields ? Array.isArray(dataFields) ? dataFields : [dataFields] : undefined;
+        return normalized;
     }
 }
 exports.AttributeBuilder = AttributeBuilder;
