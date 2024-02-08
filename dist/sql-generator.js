@@ -3,6 +3,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.findAllQueryAsSQL = void 0;
 const lodash_1 = require("lodash");
 const sequelize_1 = require("sequelize");
+function removeAttributesFromIncludes(options) {
+    if (options.include) {
+        if (Array.isArray(options.include)) {
+            options.include.forEach((subModel) => {
+                subModel.attributes = [];
+                if (subModel.include) {
+                    removeAttributesFromIncludes(subModel);
+                }
+            });
+        }
+        else {
+        }
+    }
+}
 function findAllQueryAsSQL(SeqModel, _options) {
     let options = _options;
     const tableNames = {};
@@ -28,6 +42,9 @@ function findAllQueryAsSQL(SeqModel, _options) {
     }
     if (!options.attributes) {
         options.attributes = Object.keys(SeqModel.tableAttributes);
+    }
+    else {
+        removeAttributesFromIncludes(options);
     }
     // whereCollection is used for non-primary key updates
     SeqModel.options.whereCollection = options.where || null;

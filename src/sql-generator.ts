@@ -1,6 +1,20 @@
 import { defaults } from 'lodash';
 import { FindOptions, QueryTypes, Utils } from 'sequelize';
 
+function removeAttributesFromIncludes(options: FindOptions<any>) {
+    if (options.include) {
+        if (Array.isArray(options.include)) {
+            options.include.forEach((subModel: any) => {
+                subModel.attributes = []
+                if (subModel.include) {
+                    removeAttributesFromIncludes(subModel)
+                }
+            })
+        } else {
+        }
+    }
+}
+
 export function findAllQueryAsSQL(SeqModel: any, _options: FindOptions<any>) {
     let options = _options as any;
     const tableNames: any = {};
@@ -35,6 +49,8 @@ export function findAllQueryAsSQL(SeqModel: any, _options: FindOptions<any>) {
 
     if (!options.attributes) {
         options.attributes = Object.keys(SeqModel.tableAttributes);
+    } else {
+        removeAttributesFromIncludes(options);
     }
 
     // whereCollection is used for non-primary key updates
