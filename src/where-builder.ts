@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { BuilderAbstract } from "./builder-abstract";
+import { BuilderAbstract, SeqModelLike } from "./builder-abstract";
 import { findAllQueryAsSQL } from "./sql-generator";
 import { ParsedQs } from "qs";
 
@@ -67,7 +67,7 @@ export class WhereBuilder extends BuilderAbstract {
                     [column]: { [Op.like]: `%${this.escapeSearchQuery(value as string)}%` },
                 })).concat(uuidColumns.map((column) => ({
                     [column]: { [Op.eq]: `${this.escapeSearchQuery(value as string)}` },
-                }))).concat(isNumber(value as string) ? [] : numberColumns.map((column) => ({
+                }))).concat((!isNumber(value as string)) ? [] : numberColumns.map((column) => ({
                     [column]: { [Op.eq]: `${value}` },
                 })));
 
@@ -111,7 +111,7 @@ export class WhereBuilder extends BuilderAbstract {
                 if (columnType) {
                     query[key] = this.parseFilterValue(value, columnType);
                 } else if (this.config["filter-includes"]) {
-                    const result = this.applySubQuery(key, includeMap, value)
+                    const result = this.getSubQueryOptions(this.Model, key, includeMap, value)
                     if (result) {
                         query[result.col] = result.filter;
                     }
@@ -122,15 +122,30 @@ export class WhereBuilder extends BuilderAbstract {
         return query as {}
     }
 
-    applySubQuery(key: string, map: IncludeMap, value: any): undefined | { col: string, filter: any } {
+    getSubQueryOptions(parentModel: SeqModelLike, key: string, map: IncludeMap, value: any): undefined | { col: string, filter: any } {
         if (!key.includes('.')) {
             return undefined
         }
         const [model, ...rest] = key.split('.')
-        if (map[model] && map[model].association.source.tableName == (this.Model as any).tableName) {
+        if (map[model] && map[model].association.source.tableName == (parentModel as any).tableName) {
             if (rest.length > 1) {
-                if (map[model].includeMap)
-                    return this.applySubQuery(rest.join('.'), map[model].includeMap, value);
+                if (map[model].includeMap) {
+                    const subOptions = this.getSubQueryOptions(map[model].model, rest.join('.'), map[model].includeMap, value);
+                    if (!subOptions) {
+                        return undefined
+                    }
+                    const subQuery = findAllQueryAsSQL(map[model].model, {
+                        where: {
+                            [subOptions.col]: subOptions.filter
+                        }, attributes: ['id']
+                    })
+                    return {
+                        col: map[model].association.foreignKey,
+                        filter: {
+                            [Op.in]: this.sequelize.literal(`(${subQuery})`)
+                        }
+                    };
+                }
                 return undefined;
             }
             else {

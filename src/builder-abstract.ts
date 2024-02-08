@@ -3,7 +3,7 @@ import { merge } from 'lodash'
 import defaultConfig, { Config } from './config';
 import { Sequelize } from 'sequelize';
 
-interface SeqModelLike {
+export interface SeqModelLike {
     sequelize: Sequelize,
     rawAttributes: { [key: string]: any }
     getTableName(): string | { tableName: string; schema: string; delimiter: string; };

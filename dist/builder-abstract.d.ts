@@ -1,7 +1,7 @@
 import * as qs from 'qs';
 import { Config } from './config';
 import { Sequelize } from 'sequelize';
-interface SeqModelLike {
+export interface SeqModelLike {
     sequelize: Sequelize;
     rawAttributes: {
         [key: string]: any;
@@ -27,4 +27,3 @@ export declare class BuilderAbstract {
      */
     static prepareRequest(request?: qs.ParsedQs): qs.ParsedQs;
 }
-export {};

@@ -55,7 +55,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     [column]: { [sequelize_1.Op.like]: `%${this.escapeSearchQuery(value)}%` },
                 })).concat(uuidColumns.map((column) => ({
                     [column]: { [sequelize_1.Op.eq]: `${this.escapeSearchQuery(value)}` },
-                }))).concat(isNumber(value) ? [] : numberColumns.map((column) => ({
+                }))).concat((!isNumber(value)) ? [] : numberColumns.map((column) => ({
                     [column]: { [sequelize_1.Op.eq]: `${value}` },
                 })));
                 if (this.config["filter-includes"]) {
@@ -101,7 +101,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     query[key] = this.parseFilterValue(value, columnType);
                 }
                 else if (this.config["filter-includes"]) {
-                    const result = this.applySubQuery(key, includeMap, value);
+                    const result = this.getSubQueryOptions(this.Model, key, includeMap, value);
                     if (result) {
                         query[result.col] = result.filter;
                     }
@@ -110,15 +110,30 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
         }
         return query;
     }
-    applySubQuery(key, map, value) {
+    getSubQueryOptions(parentModel, key, map, value) {
         if (!key.includes('.')) {
             return undefined;
         }
         const [model, ...rest] = key.split('.');
-        if (map[model] && map[model].association.source.tableName == this.Model.tableName) {
+        if (map[model] && map[model].association.source.tableName == parentModel.tableName) {
             if (rest.length > 1) {
-                if (map[model].includeMap)
-                    return this.applySubQuery(rest.join('.'), map[model].includeMap, value);
+                if (map[model].includeMap) {
+                    const subOptions = this.getSubQueryOptions(map[model].model, rest.join('.'), map[model].includeMap, value);
+                    if (!subOptions) {
+                        return undefined;
+                    }
+                    const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, {
+                        where: {
+                            [subOptions.col]: subOptions.filter
+                        }, attributes: ['id']
+                    });
+                    return {
+                        col: map[model].association.foreignKey,
+                        filter: {
+                            [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
+                        }
+                    };
+                }
                 return undefined;
             }
             else {
