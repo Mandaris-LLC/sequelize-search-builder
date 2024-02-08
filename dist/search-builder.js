@@ -56,6 +56,9 @@ class SearchBuilder extends builder_abstract_1.BuilderAbstract {
         if (limit === -1) {
             return null;
         }
+        if (!limit && this.getAttributes()?.length) {
+            return null;
+        }
         return limit || this.config['default-limit'] || null;
     }
     /**

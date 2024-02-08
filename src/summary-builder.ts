@@ -1,6 +1,7 @@
 import { BuilderAbstract } from "./builder-abstract";
 
 export class SummaryBuilder extends BuilderAbstract {
+
     getQuery() {
         const { request } = this;
         const summaries = request['totalSummary'] as { selector: string, summaryType: 'sum' | 'count' }[]
@@ -14,4 +15,5 @@ export class SummaryBuilder extends BuilderAbstract {
             return prev;
         }, {} as { [key: string]: { field: string, function: string } })
     }
+
 }
