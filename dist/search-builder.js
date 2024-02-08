@@ -59,7 +59,7 @@ class SearchBuilder extends builder_abstract_1.BuilderAbstract {
         if (!limit && this.getAttributes()?.length) {
             return null;
         }
-        return limit || this.config['default-limit'] || null;
+        return limit || null;
     }
     /**
      * Get string with offset value

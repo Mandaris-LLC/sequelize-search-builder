@@ -64,7 +64,7 @@ export class SearchBuilder extends BuilderAbstract {
         if (!limit && this.getAttributes()?.length) {
             return null
         }
-        return limit || this.config['default-limit'] || null;
+        return limit || null;
     }
 
     /**
