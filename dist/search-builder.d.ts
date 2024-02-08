@@ -19,14 +19,11 @@ export declare class SearchBuilder extends BuilderAbstract {
     getQueryByType(type: 'filter' | 'order'): any;
     getSummaryQueries(): {
         [key: string]: {
-            /**
-             * Get object with sequelize order conditions
-             * @returns {(Object|null)} sequelize order query
-             */
             field: string;
             function: string;
         };
     };
+    getAttributes(): string[] | undefined;
     /**
      * Get string with limit value
      * @returns {(int|null)} limit value

@@ -3,6 +3,7 @@ import { BuilderAbstract } from "./builder-abstract";
 import { OrderBuilder } from "./order-builder";
 import { WhereBuilder } from "./where-builder";
 import { SummaryBuilder } from "./summary-builder";
+import { AttributeBuilder } from "./attribute-builder";
 
 const constructors = {
     filter: WhereBuilder,
@@ -41,6 +42,11 @@ export class SearchBuilder extends BuilderAbstract {
     getSummaryQueries() {
         const summaryBuilder = new SummaryBuilder(this.Model, this.request, this.config)
         return summaryBuilder.getQuery()
+    }
+
+    getAttributes() {
+        const summaryBuilder = new AttributeBuilder(this.Model, this.request, this.config)
+        return summaryBuilder.getAttributes()
     }
 
     /**
