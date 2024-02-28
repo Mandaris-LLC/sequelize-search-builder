@@ -205,6 +205,9 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         break;
                     case '=':
                     case 'eq':
+                        if (Array.isArray(filterValue)) {
+                            return { [sequelize_1.Op.in]: filterValue.map((value) => this.parseValue(value, columnType)) };
+                        }
                         return { [sequelize_1.Op.eq]: this.parseValue(filterValue, columnType) };
                     case 'in':
                         if (Array.isArray(filterValue)) {

@@ -223,6 +223,9 @@ export class WhereBuilder extends BuilderAbstract {
                         break;
                     case '=':
                     case 'eq':
+                        if (Array.isArray(filterValue)) {
+                            return { [Op.in]: filterValue.map((value) => this.parseValue(value, columnType)) };
+                        }
                         return { [Op.eq]: this.parseValue(filterValue, columnType) };
                     case 'in':
                         if (Array.isArray(filterValue)) {
