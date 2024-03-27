@@ -236,6 +236,14 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                             return { [sequelize_1.Op.in]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
                         }
                         return { [sequelize_1.Op.eq]: this.parseValue(filterValue, columnType) };
+                    case 'notIn':
+                        if (Array.isArray(filterValue)) {
+                            return { [sequelize_1.Op.notIn]: filterValue.map((value) => this.parseValue(value, columnType)) };
+                        }
+                        else if (typeof filterValue === 'object') {
+                            return { [sequelize_1.Op.notIn]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
+                        }
+                        return { [sequelize_1.Op.ne]: this.parseValue(filterValue, columnType) };
                     case 'between':
                         return { [sequelize_1.Op.between]: [this.parseValue(filterValue[0], columnType), this.parseValue(filterValue[1], columnType)] };
                     case 'like':

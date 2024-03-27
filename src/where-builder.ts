@@ -252,6 +252,13 @@ export class WhereBuilder extends BuilderAbstract {
                             return { [Op.in]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
                         }
                         return { [Op.eq]: this.parseValue(filterValue, columnType) };
+                    case 'notIn':
+                        if (Array.isArray(filterValue)) {
+                            return { [Op.notIn]: filterValue.map((value) => this.parseValue(value, columnType)) };
+                        } else if (typeof filterValue === 'object') {
+                            return { [Op.notIn]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
+                        }
+                        return { [Op.ne]: this.parseValue(filterValue, columnType) };
                     case 'between':
                         return { [Op.between]: [this.parseValue(filterValue[0], columnType), this.parseValue(filterValue[1], columnType)] };
                     case 'like':
