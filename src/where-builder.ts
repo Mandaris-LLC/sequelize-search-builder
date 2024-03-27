@@ -149,6 +149,21 @@ export class WhereBuilder extends BuilderAbstract {
                 return undefined;
             }
             else {
+                if (value['not'] && value['not'] === 'null') {
+                    return {
+                        col: map[model].association.foreignKey,
+                        filter: {
+                            [Op.not]: null
+                        }
+                    };
+                } else if (value['is'] && value['is'] === 'null') {
+                    return {
+                        col: map[model].association.foreignKey,
+                        filter: {
+                            [Op.is]: null
+                        }
+                    };
+                }
                 const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
                 const subQuery = findAllQueryAsSQL(map[model].model, { where: builder.getQuery(), attributes: ['id'] })
                 return {

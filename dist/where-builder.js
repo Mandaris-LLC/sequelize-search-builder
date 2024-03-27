@@ -137,6 +137,22 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                 return undefined;
             }
             else {
+                if (value['not'] && value['not'] === 'null') {
+                    return {
+                        col: map[model].association.foreignKey,
+                        filter: {
+                            [sequelize_1.Op.not]: null
+                        }
+                    };
+                }
+                else if (value['is'] && value['is'] === 'null') {
+                    return {
+                        col: map[model].association.foreignKey,
+                        filter: {
+                            [sequelize_1.Op.is]: null
+                        }
+                    };
+                }
                 const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
                 const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, { where: builder.getQuery(), attributes: ['id'] });
                 return {
