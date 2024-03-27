@@ -122,13 +122,16 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     if (!subOptions) {
                         return undefined;
                     }
+                    const attributes = map[model].association.associationType === 'HasMany' ? [map[model].association.foreignKey] : ['id'];
                     const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, {
                         where: {
                             [subOptions.col]: subOptions.filter
-                        }, attributes: ['id']
+                        },
+                        attributes: attributes,
+                        raw: true
                     });
                     return {
-                        col: map[model].association.foreignKey,
+                        col: map[model].association.associationType === 'HasMany' ? map[model].association.sourceKey : map[model].association.foreignKey,
                         filter: {
                             [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
                         }
