@@ -211,6 +211,9 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         return { [sequelize_1.Op.lte]: this.parseValue(filterValue, columnType) };
                     case '<>':
                     case 'ne':
+                        if (filterValue === 'null') {
+                            return { [sequelize_1.Op.not]: null };
+                        }
                         return { [sequelize_1.Op.ne]: this.parseValue(filterValue, columnType) };
                     case 'is':
                         if (filterValue === 'null') {
@@ -224,6 +227,9 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         break;
                     case '=':
                     case 'eq':
+                        if (filterValue === 'null') {
+                            return { [sequelize_1.Op.is]: null };
+                        }
                         if (Array.isArray(filterValue)) {
                             return { [sequelize_1.Op.in]: filterValue.map((value) => this.parseValue(value, columnType)) };
                         }

@@ -228,6 +228,9 @@ export class WhereBuilder extends BuilderAbstract {
                         return { [Op.lte]: this.parseValue(filterValue, columnType) };
                     case '<>':
                     case 'ne':
+                        if (filterValue === 'null') {
+                            return { [Op.not]: null };
+                        }
                         return { [Op.ne]: this.parseValue(filterValue, columnType) };
                     case 'is':
                         if (filterValue === 'null') {
@@ -241,6 +244,9 @@ export class WhereBuilder extends BuilderAbstract {
                         break;
                     case '=':
                     case 'eq':
+                        if (filterValue === 'null') {
+                            return { [Op.is]: null };
+                        }
                         if (Array.isArray(filterValue)) {
                             return { [Op.in]: filterValue.map((value) => this.parseValue(value, columnType)) };
                         }
