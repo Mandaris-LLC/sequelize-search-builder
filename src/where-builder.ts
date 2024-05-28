@@ -170,7 +170,7 @@ export class WhereBuilder extends BuilderAbstract {
                 const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
                 const subQuery = findAllQueryAsSQL(map[model].model, { where: builder.getQuery(), attributes: ['id'] })
                 return {
-                    col: map[model].association.foreignKey,
+                    col: map[model].association.associationType === 'HasMany' ? map[model].association.sourceKey : map[model].association.foreignKey,
                     filter: {
                         [Op.in]: this.sequelize.literal(`(${subQuery})`)
                     }
