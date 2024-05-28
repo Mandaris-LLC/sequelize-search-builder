@@ -156,8 +156,9 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         }
                     };
                 }
+                const attributes = map[model].association.associationType === 'HasMany' ? [map[model].association.foreignKey] : ['id'];
                 const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
-                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, { where: builder.getQuery(), attributes: ['id'] });
+                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, { where: builder.getQuery(), attributes: attributes });
                 return {
                     col: map[model].association.associationType === 'HasMany' ? map[model].association.sourceKey : map[model].association.foreignKey,
                     filter: {
