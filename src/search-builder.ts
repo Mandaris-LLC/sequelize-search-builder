@@ -50,7 +50,7 @@ export class SearchBuilder extends BuilderAbstract {
     }
 
     getParanoid() {
-        return this.request['paranoid'] ? true : undefined
+        return this.request['deleted'] ? false : undefined
     }
 
     /**

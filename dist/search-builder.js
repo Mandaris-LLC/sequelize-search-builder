@@ -45,7 +45,7 @@ class SearchBuilder extends builder_abstract_1.BuilderAbstract {
         return summaryBuilder.getAttributes();
     }
     getParanoid() {
-        return this.request['paranoid'] ? true : undefined;
+        return this.request['deleted'] ? false : undefined;
     }
     /**
      * Get string with limit value
