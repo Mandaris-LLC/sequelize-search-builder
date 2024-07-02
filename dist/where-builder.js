@@ -82,17 +82,26 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     }
                 }
             }
-            else if (key == 'or' || key == 'and') {
+            else if (key == 'or' || key == 'and' || key == 'not') {
+                const operator = (() => {
+                    if (key === 'or') {
+                        return sequelize_1.Op.or;
+                    }
+                    if (key === 'and') {
+                        return sequelize_1.Op.and;
+                    }
+                    return sequelize_1.Op.not;
+                })();
                 if (Array.isArray(value)) {
-                    query[(key == 'or' ? sequelize_1.Op.or : sequelize_1.Op.and)] = [];
+                    query[operator] = [];
                     value.forEach((value) => {
                         const builder = new WhereBuilder(this.Model, value);
-                        query[(key == 'or' ? sequelize_1.Op.or : sequelize_1.Op.and)].push(builder.getQuery());
+                        query[operator].push(builder.getQuery());
                     });
                 }
                 else {
                     const builder = new WhereBuilder(this.Model, value);
-                    query[(key == 'or' ? sequelize_1.Op.or : sequelize_1.Op.and)] = builder.getQuery();
+                    query[operator] = builder.getQuery();
                 }
             }
             else {

@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, Operators } from "sequelize";
 import { BuilderAbstract, SeqModelLike } from "./builder-abstract";
 import { findAllQueryAsSQL } from "./sql-generator";
 import { ParsedQs } from "qs";
@@ -95,16 +95,25 @@ export class WhereBuilder extends BuilderAbstract {
                     }
                 }
 
-            } else if (key == 'or' || key == 'and') {
+            } else if (key == 'or' || key == 'and' || key == 'not') {
+                const operator: keyof Operators = (() => {
+                    if (key === 'or') {
+                        return Op.or
+                    }
+                    if (key === 'and') {
+                        return Op.and
+                    }
+                    return Op.not
+                })() as any;
                 if (Array.isArray(value)) {
-                    query[(key == 'or' ? Op.or : Op.and as any)] = [];
+                    query[operator] = [];
                     value.forEach((value) => {
                         const builder = new WhereBuilder(this.Model, value as ParsedQs);
-                        query[(key == 'or' ? Op.or : Op.and as any)].push(builder.getQuery());
+                        query[operator].push(builder.getQuery());
                     })
                 } else {
                     const builder = new WhereBuilder(this.Model, value as ParsedQs);
-                    query[(key == 'or' ? Op.or : Op.and as any)] = builder.getQuery()
+                    query[operator] = builder.getQuery()
                 }
             } else {
                 const columnType = columnTypes[key];
