@@ -44,6 +44,9 @@ class SearchBuilder extends builder_abstract_1.BuilderAbstract {
         const summaryBuilder = new attribute_builder_1.AttributeBuilder(this.Model, this.request, this.config);
         return summaryBuilder.getAttributes();
     }
+    getParanoid() {
+        return this.request['paranoid'] ? true : undefined;
+    }
     /**
      * Get string with limit value
      * @returns {(int|null)} limit value

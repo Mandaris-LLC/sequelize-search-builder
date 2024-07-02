@@ -49,6 +49,10 @@ export class SearchBuilder extends BuilderAbstract {
         return summaryBuilder.getAttributes()
     }
 
+    getParanoid() {
+        return this.request['paranoid'] ? true : undefined
+    }
+
     /**
      * Get string with limit value
      * @returns {(int|null)} limit value

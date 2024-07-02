@@ -24,6 +24,7 @@ export declare class SearchBuilder extends BuilderAbstract {
         };
     };
     getAttributes(): string[] | undefined;
+    getParanoid(): true | undefined;
     /**
      * Get string with limit value
      * @returns {(int|null)} limit value
