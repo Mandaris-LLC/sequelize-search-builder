@@ -63,7 +63,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         if (!includeMap[model].association.through) {
                             const builder = new WhereBuilder(includeMap[model].model, request);
                             if (includeMap[model].association.associationType !== 'HasMany') {
-                                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'] });
+                                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'], raw: true });
                                 query[sequelize_1.Op.or].push({
                                     [includeMap[model].association.foreignKey]: {
                                         [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
@@ -71,7 +71,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                                 });
                             }
                             else {
-                                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: [includeMap[model].association.foreignKey] });
+                                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: [includeMap[model].association.foreignKey], raw: true });
                                 query[sequelize_1.Op.or].push({
                                     [includeMap[model].association.sourceKey]: {
                                         [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
@@ -167,7 +167,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                 }
                 const attributes = map[model].association.associationType === 'HasMany' ? [map[model].association.foreignKey] : ['id'];
                 const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
-                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, { where: builder.getQuery(), attributes: attributes });
+                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, { where: builder.getQuery(), attributes: attributes, raw: true });
                 return {
                     col: map[model].association.associationType === 'HasMany' ? map[model].association.sourceKey : map[model].association.foreignKey,
                     filter: {
