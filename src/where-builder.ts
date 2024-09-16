@@ -176,6 +176,27 @@ export class WhereBuilder extends BuilderAbstract {
                         }
                     };
                 }
+                if (map[model].association.associationType === 'BelongsToMany') {
+                    const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
+                    const attributes = ['id']
+                    const subQuery = findAllQueryAsSQL(parentModel, {
+                        include: [
+                            {
+                                model: map[model].model,
+                                as: map[model].as,
+                                where: builder.getQuery(),
+                            }
+                        ],
+                        attributes: attributes,
+                        raw: true
+                    })
+                    return {
+                        col: map[model].association.sourceKey,
+                        filter: {
+                            [Op.in]: this.sequelize.literal(`(${subQuery})`)
+                        }
+                    }
+                }
                 const attributes = map[model].association.associationType === 'HasMany' ? [map[model].association.foreignKey] : ['id']
                 const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
                 const subQuery = findAllQueryAsSQL(map[model].model, { where: builder.getQuery(), attributes: attributes, raw: true })
