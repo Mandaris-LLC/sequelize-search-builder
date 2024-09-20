@@ -174,6 +174,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                                 model: map[model].model,
                                 as: map[model].as,
                                 where: builder.getQuery(),
+                                required: true
                             }
                         ],
                         attributes: attributes,
