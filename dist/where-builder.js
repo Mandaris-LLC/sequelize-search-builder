@@ -14,6 +14,9 @@ function isNumber(num) {
     return false;
 }
 ;
+function foreignKeyInTarget(associationType) {
+    return associationType === 'HasMany' || associationType === 'HasOne';
+}
 class WhereBuilder extends builder_abstract_1.BuilderAbstract {
     extractColumnTypes() {
         const columnTypes = {};
@@ -62,7 +65,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     for (const model in includeMap) {
                         if (!includeMap[model].association.through) {
                             const builder = new WhereBuilder(includeMap[model].model, request);
-                            if (includeMap[model].association.associationType !== 'HasMany') {
+                            if (!foreignKeyInTarget(includeMap[model].association.associationType)) {
                                 const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'], raw: true });
                                 query[sequelize_1.Op.or].push({
                                     [includeMap[model].association.foreignKey]: {
@@ -131,7 +134,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     if (!subOptions) {
                         return undefined;
                     }
-                    const attributes = map[model].association.associationType === 'HasMany' ? [map[model].association.foreignKey] : ['id'];
+                    const attributes = foreignKeyInTarget(map[model].association.associationType) ? [map[model].association.foreignKey] : ['id'];
                     const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, {
                         where: {
                             [subOptions.col]: subOptions.filter
@@ -140,7 +143,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         raw: true
                     });
                     return {
-                        col: map[model].association.associationType === 'HasMany' ? map[model].association.sourceKey : map[model].association.foreignKey,
+                        col: foreignKeyInTarget(map[model].association.associationType) ? map[model].association.sourceKey : map[model].association.foreignKey,
                         filter: {
                             [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
                         }
@@ -187,11 +190,11 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         }
                     };
                 }
-                const attributes = map[model].association.associationType === 'HasMany' ? [map[model].association.foreignKey] : ['id'];
+                const attributes = foreignKeyInTarget(map[model].association.associationType) ? [map[model].association.foreignKey] : ['id'];
                 const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
                 const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, { where: builder.getQuery(), attributes: attributes, raw: true });
                 return {
-                    col: map[model].association.associationType === 'HasMany' ? map[model].association.sourceKey : map[model].association.foreignKey,
+                    col: foreignKeyInTarget(map[model].association.associationType) ? map[model].association.sourceKey : map[model].association.foreignKey,
                     filter: {
                         [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
                     }
