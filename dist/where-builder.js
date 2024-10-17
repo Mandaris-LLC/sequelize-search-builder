@@ -17,6 +17,12 @@ function isNumber(num) {
 function foreignKeyInTarget(associationType) {
     return associationType === 'HasMany' || associationType === 'HasOne';
 }
+function isObjectArray(value) {
+    if (typeof value === 'object') {
+        return Object.keys(value).every((v) => isNumber(v));
+    }
+    return false;
+}
 class WhereBuilder extends builder_abstract_1.BuilderAbstract {
     extractColumnTypes() {
         const columnTypes = {};
@@ -98,6 +104,13 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                 if (Array.isArray(value)) {
                     query[operator] = [];
                     value.forEach((value) => {
+                        const builder = new WhereBuilder(this.Model, value);
+                        query[operator].push(builder.getQuery());
+                    });
+                }
+                else if (isObjectArray(value)) {
+                    query[operator] = [];
+                    Object.values(value).forEach((value) => {
                         const builder = new WhereBuilder(this.Model, value);
                         query[operator].push(builder.getQuery());
                     });
@@ -273,7 +286,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         if (Array.isArray(filterValue)) {
                             return { [sequelize_1.Op.in]: filterValue.map((value) => this.parseValue(value, columnType)) };
                         }
-                        else if (typeof filterValue === 'object') {
+                        else if (isObjectArray(filterValue)) {
                             return { [sequelize_1.Op.in]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
                         }
                         return { [sequelize_1.Op.eq]: this.parseValue(filterValue, columnType) };
@@ -281,7 +294,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         if (Array.isArray(filterValue)) {
                             return { [sequelize_1.Op.notIn]: filterValue.map((value) => this.parseValue(value, columnType)) };
                         }
-                        else if (typeof filterValue === 'object') {
+                        else if (isObjectArray(filterValue)) {
                             return { [sequelize_1.Op.notIn]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
                         }
                         return { [sequelize_1.Op.ne]: this.parseValue(filterValue, columnType) };

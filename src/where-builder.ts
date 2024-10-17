@@ -19,6 +19,13 @@ function foreignKeyInTarget(associationType: string) {
     return associationType === 'HasMany' || associationType === 'HasOne'
 }
 
+function isObjectArray(value: any) {
+    if (typeof value === 'object') {
+        return Object.keys(value).every((v) => isNumber(v))
+    }
+    return false
+}
+
 export class WhereBuilder extends BuilderAbstract {
 
     extractColumnTypes(): { columnTypes: { [key: string]: string }, includeMap: IncludeMap } {
@@ -112,6 +119,12 @@ export class WhereBuilder extends BuilderAbstract {
                 if (Array.isArray(value)) {
                     query[operator] = [];
                     value.forEach((value) => {
+                        const builder = new WhereBuilder(this.Model, value as ParsedQs);
+                        query[operator].push(builder.getQuery());
+                    })
+                } else if (isObjectArray(value)) {
+                    query[operator] = [];
+                    Object.values(value as any).forEach((value) => {
                         const builder = new WhereBuilder(this.Model, value as ParsedQs);
                         query[operator].push(builder.getQuery());
                     })
@@ -290,14 +303,14 @@ export class WhereBuilder extends BuilderAbstract {
                     case 'in':
                         if (Array.isArray(filterValue)) {
                             return { [Op.in]: filterValue.map((value) => this.parseValue(value, columnType)) };
-                        } else if (typeof filterValue === 'object') {
+                        } else if (isObjectArray(filterValue)) {
                             return { [Op.in]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
                         }
                         return { [Op.eq]: this.parseValue(filterValue, columnType) };
                     case 'notIn':
                         if (Array.isArray(filterValue)) {
                             return { [Op.notIn]: filterValue.map((value) => this.parseValue(value, columnType)) };
-                        } else if (typeof filterValue === 'object') {
+                        } else if (isObjectArray(filterValue)) {
                             return { [Op.notIn]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
                         }
                         return { [Op.ne]: this.parseValue(filterValue, columnType) };
