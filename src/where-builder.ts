@@ -1,4 +1,4 @@
-import { Op, Operators } from "sequelize";
+import { Op, WhereAttributeHash, WhereAttributeHashValue } from "sequelize";
 import { BuilderAbstract, SeqModelLike } from "./builder-abstract";
 import { findAllQueryAsSQL } from "./sql-generator";
 import { ParsedQs } from "qs";
@@ -64,7 +64,7 @@ export class WhereBuilder extends BuilderAbstract {
 
     getQuery() {
         const { request } = this;
-        const query: { [key: string]: any } = {};
+        const query: WhereAttributeHashValue<any> = {};
 
         const { columnTypes, includeMap } = this.extractColumnTypes();
 
@@ -74,12 +74,23 @@ export class WhereBuilder extends BuilderAbstract {
                 const searchColumns = this.getSearchableColumns(columnTypes);
                 const uuidColumns = this.getPotentialUUIDColumns(columnTypes);
                 const numberColumns = this.getNumberColumns(columnTypes);
-                query[Op.or as any] = searchColumns.map((column) => ({
-                    [column]: { [Op.like]: `%${this.escapeSearchQuery(value as string)}%` },
+                query[Op.or] = searchColumns.map<{
+                    [x: string]: {
+                        [Op.like]?: string;
+                        [Op.eq]?: string;
+                    };
+                }>((column) => ({
+                    [column]: {
+                        [Op.like]: `%${this.escapeSearchQuery(value as string)}%`
+                    },
                 })).concat(uuidColumns.map((column) => ({
-                    [column]: { [Op.eq]: `${this.escapeSearchQuery(value as string)}` },
+                    [column]: {
+                        [Op.eq]: `${this.escapeSearchQuery(value as string)}`
+                    },
                 }))).concat((!isNumber(value as string)) ? [] : numberColumns.map((column) => ({
-                    [column]: { [Op.eq]: `${value}` },
+                    [column]: {
+                        [Op.eq]: `${value}`
+                    },
                 })));
 
 
@@ -107,7 +118,7 @@ export class WhereBuilder extends BuilderAbstract {
                 }
 
             } else if (key == 'or' || key == 'and' || key == 'not') {
-                const operator: keyof Operators = (() => {
+                const operator: unique symbol = (() => {
                     if (key === 'or') {
                         return Op.or
                     }

@@ -61,11 +61,17 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                 const uuidColumns = this.getPotentialUUIDColumns(columnTypes);
                 const numberColumns = this.getNumberColumns(columnTypes);
                 query[sequelize_1.Op.or] = searchColumns.map((column) => ({
-                    [column]: { [sequelize_1.Op.like]: `%${this.escapeSearchQuery(value)}%` },
+                    [column]: {
+                        [sequelize_1.Op.like]: `%${this.escapeSearchQuery(value)}%`
+                    },
                 })).concat(uuidColumns.map((column) => ({
-                    [column]: { [sequelize_1.Op.eq]: `${this.escapeSearchQuery(value)}` },
+                    [column]: {
+                        [sequelize_1.Op.eq]: `${this.escapeSearchQuery(value)}`
+                    },
                 }))).concat((!isNumber(value)) ? [] : numberColumns.map((column) => ({
-                    [column]: { [sequelize_1.Op.eq]: `${value}` },
+                    [column]: {
+                        [sequelize_1.Op.eq]: `${value}`
+                    },
                 })));
                 if (this.config["filter-includes"]) {
                     for (const model in includeMap) {
