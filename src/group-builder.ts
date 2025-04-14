@@ -5,7 +5,9 @@ export class GroupBuilder extends BuilderAbstract {
     getQuery() {
         const { request } = this;
         const groups = request['group'] as { selector: string, desc: 'false' | 'true', isExapnded: 'false' | 'true' }[]
-
+        if (!Array.isArray(groups)) {
+            return undefined
+        }
         return groups?.reduce((prev, summary) => {
             const name = this.Model.name
             prev[summary.selector] = {

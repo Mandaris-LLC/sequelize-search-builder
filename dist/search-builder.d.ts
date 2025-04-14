@@ -28,7 +28,7 @@ export declare class SearchBuilder extends BuilderAbstract {
             field: string;
             desc: boolean;
         };
-    };
+    } | undefined;
     getAttributes(): string[] | undefined;
     getParanoid(): false | undefined;
     /**

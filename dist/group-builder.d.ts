@@ -5,5 +5,5 @@ export declare class GroupBuilder extends BuilderAbstract {
             field: string;
             desc: boolean;
         };
-    };
+    } | undefined;
 }
