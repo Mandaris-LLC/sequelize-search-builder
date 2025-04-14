@@ -6,6 +6,7 @@ const order_builder_1 = require("./order-builder");
 const where_builder_1 = require("./where-builder");
 const summary_builder_1 = require("./summary-builder");
 const attribute_builder_1 = require("./attribute-builder");
+const group_builder_1 = require("./group-builder");
 const constructors = {
     filter: where_builder_1.WhereBuilder,
     order: order_builder_1.OrderBuilder,
@@ -39,6 +40,10 @@ class SearchBuilder extends builder_abstract_1.BuilderAbstract {
     getSummaryQueries() {
         const summaryBuilder = new summary_builder_1.SummaryBuilder(this.Model, this.request, this.config);
         return summaryBuilder.getQuery();
+    }
+    getGroupQuery() {
+        const builder = new group_builder_1.GroupBuilder(this.Model, this.request, this.config);
+        return builder.getQuery();
     }
     getAttributes() {
         const summaryBuilder = new attribute_builder_1.AttributeBuilder(this.Model, this.request, this.config);
