@@ -13,9 +13,10 @@ export class GroupBuilder extends BuilderAbstract {
             prev[summary.selector] = {
                 field: `${name}.${summary.selector}`,
                 desc: summary.desc == 'true' ? true : false,
+                isExapnded: summary.isExapnded == 'true' ? true : false,
             }
             return prev;
-        }, {} as { [key: string]: { field: string, desc: boolean } })
+        }, {} as { [key: string]: { field: string, desc: boolean, isExapnded: boolean } })
     }
 
 }

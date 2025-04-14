@@ -4,6 +4,7 @@ export declare class GroupBuilder extends BuilderAbstract {
         [key: string]: {
             field: string;
             desc: boolean;
+            isExapnded: boolean;
         };
     } | undefined;
 }

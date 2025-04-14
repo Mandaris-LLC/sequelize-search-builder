@@ -27,6 +27,7 @@ export declare class SearchBuilder extends BuilderAbstract {
         [key: string]: {
             field: string;
             desc: boolean;
+            isExapnded: boolean;
         };
     } | undefined;
     getAttributes(): string[] | undefined;

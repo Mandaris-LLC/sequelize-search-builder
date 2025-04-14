@@ -14,6 +14,7 @@ class GroupBuilder extends builder_abstract_1.BuilderAbstract {
             prev[summary.selector] = {
                 field: `${name}.${summary.selector}`,
                 desc: summary.desc == 'true' ? true : false,
+                isExapnded: summary.isExapnded == 'true' ? true : false,
             };
             return prev;
         }, {});
