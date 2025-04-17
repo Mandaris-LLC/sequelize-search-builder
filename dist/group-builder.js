@@ -11,10 +11,8 @@ class GroupBuilder extends builder_abstract_1.BuilderAbstract {
         }
         return groups?.map((group) => {
             const name = this.Model.name;
-            const { includeMap } = this.extractColumnTypes();
-            console.log(includeMap);
             return {
-                field: `${name}.${group.selector}`,
+                field: group.selector.includes('.') ? group.selector : `${name}.${group.selector}`,
                 desc: group.desc == 'true' ? true : false,
                 isExpanded: group.isExpanded == 'true' ? true : false,
             };

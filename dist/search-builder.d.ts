@@ -26,7 +26,10 @@ export declare class SearchBuilder extends BuilderAbstract {
     getGroupQuery(): {
         field: string;
         desc: boolean;
-        isExpanded: boolean;
+        isExpanded: boolean; /**
+         * Get object with sequelize order conditions
+         * @returns {(Object|null)} sequelize order query
+         */
     }[] | undefined;
     getAttributes(): string[] | undefined;
     getParanoid(): false | undefined;
