@@ -24,12 +24,10 @@ export declare class SearchBuilder extends BuilderAbstract {
         };
     };
     getGroupQuery(): {
-        [key: string]: {
-            field: string;
-            desc: boolean;
-            isExapnded: boolean;
-        };
-    } | undefined;
+        field: string;
+        desc: boolean;
+        isExpanded: boolean;
+    }[] | undefined;
     getAttributes(): string[] | undefined;
     getParanoid(): false | undefined;
     /**

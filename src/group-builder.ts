@@ -4,19 +4,18 @@ export class GroupBuilder extends BuilderAbstract {
 
     getQuery() {
         const { request } = this;
-        const groups = request['group'] as { selector: string, desc: 'false' | 'true', isExapnded: 'false' | 'true' }[]
+        const groups = request['group'] as { selector: string, desc: 'false' | 'true', isExpanded: 'false' | 'true' }[]
         if (!Array.isArray(groups)) {
             return undefined
         }
-        return groups?.reduce((prev, summary) => {
+        return groups?.map((group) => {
             const name = this.Model.name
-            prev[summary.selector] = {
-                field: `${name}.${summary.selector}`,
-                desc: summary.desc == 'true' ? true : false,
-                isExapnded: summary.isExapnded == 'true' ? true : false,
+            return {
+                field: `${name}.${group.selector}`,
+                desc: group.desc == 'true' ? true : false,
+                isExpanded: group.isExpanded == 'true' ? true : false,
             }
-            return prev;
-        }, {} as { [key: string]: { field: string, desc: boolean, isExapnded: boolean } })
+        })
     }
 
 }

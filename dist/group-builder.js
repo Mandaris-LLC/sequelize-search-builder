@@ -9,15 +9,14 @@ class GroupBuilder extends builder_abstract_1.BuilderAbstract {
         if (!Array.isArray(groups)) {
             return undefined;
         }
-        return groups?.reduce((prev, summary) => {
+        return groups?.map((group) => {
             const name = this.Model.name;
-            prev[summary.selector] = {
-                field: `${name}.${summary.selector}`,
-                desc: summary.desc == 'true' ? true : false,
-                isExapnded: summary.isExapnded == 'true' ? true : false,
+            return {
+                field: `${name}.${group.selector}`,
+                desc: group.desc == 'true' ? true : false,
+                isExpanded: group.isExpanded == 'true' ? true : false,
             };
-            return prev;
-        }, {});
+        });
     }
 }
 exports.GroupBuilder = GroupBuilder;
