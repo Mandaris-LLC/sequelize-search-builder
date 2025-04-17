@@ -1,6 +1,9 @@
 import * as qs from 'qs';
 import { Config } from './config';
 import { Sequelize } from 'sequelize';
+export type IncludeMap = {
+    [key: string]: any;
+};
 export interface SeqModelLike {
     sequelize: Sequelize;
     rawAttributes: {
@@ -19,6 +22,12 @@ export declare class BuilderAbstract {
     protected request: qs.ParsedQs;
     protected sequelize: Sequelize;
     constructor(Model: SeqModelLike, request?: qs.ParsedQs, config?: Partial<Config>);
+    protected extractColumnTypes(): {
+        columnTypes: {
+            [key: string]: string;
+        };
+        includeMap: IncludeMap;
+    };
     /**
      * Transform request to request object
      * @param {(Object|string)} request

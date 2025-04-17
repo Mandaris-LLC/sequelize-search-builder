@@ -24,33 +24,6 @@ function isObjectArray(value) {
     return false;
 }
 class WhereBuilder extends builder_abstract_1.BuilderAbstract {
-    extractColumnTypes() {
-        const columnTypes = {};
-        let options = {};
-        const tableNames = {};
-        tableNames[this.Model.getTableName(options)] = true;
-        this.Model._injectScope(options);
-        if ('_conformOptions' in this.Model) {
-            this.Model._conformOptions(options, this.Model);
-        }
-        else if ('_conformIncludes' in this.Model) {
-            this.Model._conformIncludes(options, this.Model);
-        }
-        this.Model._expandAttributes(options);
-        this.Model._expandIncludeAll(options);
-        if (options.include) {
-            options.hasJoin = true;
-            this.Model._validateIncludedElements(options, tableNames);
-        }
-        if (!options.attributes) {
-            options.attributes = Object.keys(this.Model.tableAttributes);
-        }
-        for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
-            columnTypes[attributeName] = attribute.type.key;
-        }
-        const includeMap = options.includeMap;
-        return { columnTypes, includeMap };
-    }
     getQuery() {
         const { request } = this;
         const query = {};

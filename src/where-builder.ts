@@ -1,9 +1,8 @@
-import { Op, WhereAttributeHash, WhereAttributeHashValue } from "sequelize";
-import { BuilderAbstract, SeqModelLike } from "./builder-abstract";
+import { Op, WhereAttributeHashValue } from "sequelize";
+import { BuilderAbstract, IncludeMap, SeqModelLike } from "./builder-abstract";
 import { findAllQueryAsSQL } from "./sql-generator";
 import { ParsedQs } from "qs";
 
-type IncludeMap = { [key: string]: any }
 
 function isNumber(num: string | number) {
     if (typeof num === 'number') {
@@ -27,40 +26,6 @@ function isObjectArray(value: any) {
 }
 
 export class WhereBuilder extends BuilderAbstract {
-
-    extractColumnTypes(): { columnTypes: { [key: string]: string }, includeMap: IncludeMap } {
-        const columnTypes: { [key: string]: string } = {};
-
-        let options = {} as any;
-        const tableNames = {} as any;
-
-        tableNames[(this.Model as any).getTableName(options)] = true;
-
-        (this.Model as any)._injectScope(options);
-
-        if ('_conformOptions' in this.Model) {
-            (this.Model as any)._conformOptions(options, this.Model);
-        } else if ('_conformIncludes' in this.Model) {
-            (this.Model as any)._conformIncludes(options, this.Model);
-        }
-        (this.Model as any)._expandAttributes(options);
-        (this.Model as any)._expandIncludeAll(options);
-
-        if (options.include) {
-            options.hasJoin = true;
-            (this.Model as any)._validateIncludedElements(options, tableNames);
-        }
-        if (!options.attributes) {
-            options.attributes = Object.keys((this.Model as any).tableAttributes);
-        }
-
-        for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
-            columnTypes[attributeName] = (attribute.type as any).key;
-        }
-
-        const includeMap = options.includeMap
-        return { columnTypes, includeMap };
-    }
 
     getQuery() {
         const { request } = this;

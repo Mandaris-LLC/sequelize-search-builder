@@ -1,14 +1,5 @@
-import { BuilderAbstract, SeqModelLike } from "./builder-abstract";
-type IncludeMap = {
-    [key: string]: any;
-};
+import { BuilderAbstract, IncludeMap, SeqModelLike } from "./builder-abstract";
 export declare class WhereBuilder extends BuilderAbstract {
-    extractColumnTypes(): {
-        columnTypes: {
-            [key: string]: string;
-        };
-        includeMap: IncludeMap;
-    };
     getQuery(): {};
     getSubQueryOptions(parentModel: SeqModelLike, key: string, map: IncludeMap, value: any): undefined | {
         col: string;
@@ -27,4 +18,3 @@ export declare class WhereBuilder extends BuilderAbstract {
     parseFilterValue(value: any, columnType: string): any;
     parseValue(value: any, columnType: string, escape?: boolean): any;
 }
-export {};
