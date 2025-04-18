@@ -24,13 +24,18 @@ export declare class SearchBuilder extends BuilderAbstract {
         };
     };
     getGroupQuery(): {
-        field: string;
-        desc: boolean;
-        isExpanded: boolean; /**
-         * Get object with sequelize order conditions
-         * @returns {(Object|null)} sequelize order query
-         */
-    }[] | undefined;
+        summary: {
+            [key: string]: {
+                field: string;
+                function: string;
+            };
+        };
+        groups: {
+            field: string;
+            desc: boolean;
+            isExpanded: boolean;
+        }[];
+    } | undefined;
     getAttributes(): string[] | undefined;
     getParanoid(): false | undefined;
     /**

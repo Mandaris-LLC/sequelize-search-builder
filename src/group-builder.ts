@@ -1,4 +1,5 @@
 import { BuilderAbstract } from "./builder-abstract";
+import { SummaryBuilder } from "./summary-builder";
 
 export class GroupBuilder extends BuilderAbstract {
 
@@ -8,15 +9,18 @@ export class GroupBuilder extends BuilderAbstract {
         if (!Array.isArray(groups)) {
             return undefined
         }
-        return groups?.map((group) => {
-            const name = this.Model.name
+        return {
+            summary: new SummaryBuilder(this.Model, this.request, this.config).getQuery('groupSummary'),
+            groups: groups?.map((group) => {
+                const name = this.Model.name
 
-            return {
-                field: group.selector.includes('.') ? group.selector : `${name}.${group.selector}`,
-                desc: group.desc == 'true' ? true : false,
-                isExpanded: group.isExpanded == 'true' ? true : false,
-            }
-        })
+                return {
+                    field: group.selector.includes('.') ? group.selector : `${name}.${group.selector}`,
+                    desc: group.desc == 'true' ? true : false,
+                    isExpanded: group.isExpanded == 'true' ? true : false,
+                }
+            })
+        }
     }
 
 }

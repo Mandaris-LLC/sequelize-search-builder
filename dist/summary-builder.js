@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SummaryBuilder = void 0;
 const builder_abstract_1 = require("./builder-abstract");
 class SummaryBuilder extends builder_abstract_1.BuilderAbstract {
-    getQuery() {
+    getQuery(key = 'totalSummary') {
         const { request } = this;
         const summaries = request['totalSummary'];
         return summaries?.reduce((prev, summary) => {
