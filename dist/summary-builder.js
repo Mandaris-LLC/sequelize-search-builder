@@ -13,7 +13,7 @@ class SummaryBuilder extends builder_abstract_1.BuilderAbstract {
                 function: summary.summaryType,
             };
             return prev;
-        }, {});
+        }, {}) || {};
     }
 }
 exports.SummaryBuilder = SummaryBuilder;

@@ -13,7 +13,7 @@ export class SummaryBuilder extends BuilderAbstract {
                 function: summary.summaryType,
             }
             return prev;
-        }, {} as { [key: string]: { field: string, function: string } })
+        }, {} as { [key: string]: { field: string, function: string } }) || {}
     }
 
 }
