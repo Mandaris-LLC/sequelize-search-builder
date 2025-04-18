@@ -5,7 +5,7 @@ const builder_abstract_1 = require("./builder-abstract");
 class SummaryBuilder extends builder_abstract_1.BuilderAbstract {
     getQuery(key = 'totalSummary') {
         const { request } = this;
-        const summaries = request['totalSummary'];
+        const summaries = request[key];
         return summaries?.reduce((prev, summary) => {
             const name = this.Model.name;
             prev[summary.selector] = {
