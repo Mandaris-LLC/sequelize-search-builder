@@ -7,7 +7,7 @@ class GroupBuilder extends builder_abstract_1.BuilderAbstract {
     getQuery() {
         const { request } = this;
         const groups = request['group'];
-        if (!Array.isArray(groups)) {
+        if (!groups || !Array.isArray(groups)) {
             return undefined;
         }
         return {

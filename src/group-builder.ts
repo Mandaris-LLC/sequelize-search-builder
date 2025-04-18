@@ -6,7 +6,7 @@ export class GroupBuilder extends BuilderAbstract {
     getQuery() {
         const { request } = this;
         const groups = request['group'] as { selector: string, desc: 'false' | 'true', isExpanded: 'false' | 'true' }[]
-        if (!Array.isArray(groups)) {
+        if (!groups || !Array.isArray(groups)) {
             return undefined
         }
         return {
