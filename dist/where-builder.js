@@ -295,6 +295,9 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
         return this.parseValue(value, columnType);
     }
     parseValue(value, columnType, escape = false) {
+        if (typeof value === 'string' && value.startsWith('$.')) {
+            return (0, sequelize_1.col)(value.substring(2));
+        }
         if (columnType === 'BOOLEAN') {
             return value === 'true';
         }

@@ -1,4 +1,4 @@
-import { Op, WhereAttributeHashValue } from "sequelize";
+import { col, Op, WhereAttributeHashValue } from "sequelize";
 import { BuilderAbstract, IncludeMap, SeqModelLike } from "./builder-abstract";
 import { findAllQueryAsSQL } from "./sql-generator";
 import { ParsedQs } from "qs";
@@ -309,6 +309,9 @@ export class WhereBuilder extends BuilderAbstract {
     }
 
     parseValue(value: any, columnType: string, escape = false): any {
+        if (typeof value === 'string' && value.startsWith('$.')) {
+            return col(value.substring(2))
+        }
         if (columnType === 'BOOLEAN') {
             return value === 'true';
         } else if (columnType === 'INTEGER' || columnType === 'FLOAT') {
