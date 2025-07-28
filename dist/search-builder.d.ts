@@ -1,6 +1,9 @@
 import { ParsedQs } from "qs";
-import { BuilderAbstract } from "./builder-abstract";
+import { BuilderAbstract, SeqModelLike } from "./builder-abstract";
+import { Config } from "./config";
 export declare class SearchBuilder extends BuilderAbstract {
+    protected Model: SeqModelLike;
+    constructor(Model: SeqModelLike, request?: qs.ParsedQs, config?: Partial<Config>);
     /**
      * Get object with sequelize where conditions
      * @returns {(Object|null)} sequelize where query

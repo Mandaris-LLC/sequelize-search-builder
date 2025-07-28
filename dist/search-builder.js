@@ -12,6 +12,10 @@ const constructors = {
     order: order_builder_1.OrderBuilder,
 };
 class SearchBuilder extends builder_abstract_1.BuilderAbstract {
+    constructor(Model, request = {}, config = {}) {
+        super(Model, request, request, config);
+        this.Model = Model;
+    }
     /**
      * Get object with sequelize where conditions
      * @returns {(Object|null)} sequelize where query

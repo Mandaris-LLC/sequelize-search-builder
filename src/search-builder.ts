@@ -1,10 +1,11 @@
 import { ParsedQs } from "qs";
-import { BuilderAbstract } from "./builder-abstract";
+import { BuilderAbstract, SeqModelLike } from "./builder-abstract";
 import { OrderBuilder } from "./order-builder";
 import { WhereBuilder } from "./where-builder";
 import { SummaryBuilder } from "./summary-builder";
 import { AttributeBuilder } from "./attribute-builder";
 import { GroupBuilder } from "./group-builder";
+import { Config } from "./config";
 
 const constructors = {
     filter: WhereBuilder,
@@ -12,6 +13,9 @@ const constructors = {
 };
 
 export class SearchBuilder extends BuilderAbstract {
+    constructor(protected Model: SeqModelLike, request: qs.ParsedQs = {}, config: Partial<Config> = {}) {
+        super(Model, request, request, config)
+    }
     /**
      * Get object with sequelize where conditions
      * @returns {(Object|null)} sequelize where query
