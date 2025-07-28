@@ -2,6 +2,7 @@ import * as qs from 'qs'
 import { merge } from 'lodash'
 import defaultConfig, { Config } from './config';
 import { Sequelize } from 'sequelize';
+import { isObjectArray } from './util';
 
 export type IncludeMap = { [key: string]: any }
 
@@ -25,6 +26,9 @@ export class BuilderAbstract {
         this.sequelize = Model.sequelize!
         this.request = BuilderAbstract.prepareRequest(request);
         this.globalRequest = BuilderAbstract.prepareRequest(globalRequest);
+        if (this.globalRequest['searchColumns'] && isObjectArray(this.globalRequest['searchColumns'])) {
+            this.globalRequest['searchColumns'] = Object.values(this.globalRequest['searchColumns']) as string[]
+        }
         this.config = merge(defaultConfig, config);
     }
 

@@ -2,27 +2,10 @@ import { col, Op, WhereAttributeHashValue } from "sequelize";
 import { BuilderAbstract, IncludeMap, SeqModelLike } from "./builder-abstract";
 import { findAllQueryAsSQL } from "./sql-generator";
 import { ParsedQs } from "qs";
-
-
-function isNumber(num: string | number) {
-    if (typeof num === 'number') {
-        return num - num === 0;
-    }
-    if (typeof num === 'string' && num.trim() !== '') {
-        return Number.isFinite ? Number.isFinite(+num) : isFinite(+num);
-    }
-    return false;
-};
+import { isNumber, isObjectArray } from "./util";
 
 function foreignKeyInTarget(associationType: string) {
     return associationType === 'HasMany' || associationType === 'HasOne'
-}
-
-function isObjectArray(value: any) {
-    if (typeof value === 'object') {
-        return Object.keys(value).every((v) => isNumber(v))
-    }
-    return false
 }
 
 export class WhereBuilder extends BuilderAbstract {

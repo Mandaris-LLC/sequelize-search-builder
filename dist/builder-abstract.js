@@ -4,6 +4,7 @@ exports.BuilderAbstract = void 0;
 const qs = require("qs");
 const lodash_1 = require("lodash");
 const config_1 = require("./config");
+const util_1 = require("./util");
 class BuilderAbstract {
     constructor(Model, request = {}, globalRequest = {}, config = {}) {
         this.Model = Model;
@@ -13,6 +14,9 @@ class BuilderAbstract {
         this.sequelize = Model.sequelize;
         this.request = BuilderAbstract.prepareRequest(request);
         this.globalRequest = BuilderAbstract.prepareRequest(globalRequest);
+        if (this.globalRequest['searchColumns'] && (0, util_1.isObjectArray)(this.globalRequest['searchColumns'])) {
+            this.globalRequest['searchColumns'] = Object.values(this.globalRequest['searchColumns']);
+        }
         this.config = (0, lodash_1.merge)(config_1.default, config);
     }
     extractColumnTypes() {

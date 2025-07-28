@@ -4,24 +4,9 @@ exports.WhereBuilder = void 0;
 const sequelize_1 = require("sequelize");
 const builder_abstract_1 = require("./builder-abstract");
 const sql_generator_1 = require("./sql-generator");
-function isNumber(num) {
-    if (typeof num === 'number') {
-        return num - num === 0;
-    }
-    if (typeof num === 'string' && num.trim() !== '') {
-        return Number.isFinite ? Number.isFinite(+num) : isFinite(+num);
-    }
-    return false;
-}
-;
+const util_1 = require("./util");
 function foreignKeyInTarget(associationType) {
     return associationType === 'HasMany' || associationType === 'HasOne';
-}
-function isObjectArray(value) {
-    if (typeof value === 'object') {
-        return Object.keys(value).every((v) => isNumber(v));
-    }
-    return false;
 }
 class WhereBuilder extends builder_abstract_1.BuilderAbstract {
     getQuery() {
@@ -41,7 +26,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     [column]: {
                         [sequelize_1.Op.eq]: `${this.escapeSearchQuery(value)}`
                     },
-                }))).concat((!isNumber(value)) ? [] : numberColumns.map((column) => ({
+                }))).concat((!(0, util_1.isNumber)(value)) ? [] : numberColumns.map((column) => ({
                     [column]: {
                         [sequelize_1.Op.eq]: `${value}`
                     },
@@ -91,7 +76,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         query[operator].push(builder.getQuery());
                     });
                 }
-                else if (isObjectArray(value)) {
+                else if ((0, util_1.isObjectArray)(value)) {
                     query[operator] = [];
                     Object.values(value).forEach((value) => {
                         const builder = new WhereBuilder(this.Model, value, this.globalRequest);
@@ -284,7 +269,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         if (Array.isArray(filterValue)) {
                             return { [sequelize_1.Op.in]: filterValue.map((value) => this.parseValue(value, columnType)) };
                         }
-                        else if (isObjectArray(filterValue)) {
+                        else if ((0, util_1.isObjectArray)(filterValue)) {
                             return { [sequelize_1.Op.in]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
                         }
                         return { [sequelize_1.Op.eq]: this.parseValue(filterValue, columnType) };
@@ -292,7 +277,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                         if (Array.isArray(filterValue)) {
                             return { [sequelize_1.Op.notIn]: filterValue.map((value) => this.parseValue(value, columnType)) };
                         }
-                        else if (isObjectArray(filterValue)) {
+                        else if ((0, util_1.isObjectArray)(filterValue)) {
                             return { [sequelize_1.Op.notIn]: Object.values(filterValue).map((value) => this.parseValue(value, columnType)) };
                         }
                         return { [sequelize_1.Op.ne]: this.parseValue(filterValue, columnType) };
