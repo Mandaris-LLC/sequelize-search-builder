@@ -34,19 +34,19 @@ class SearchBuilder extends builder_abstract_1.BuilderAbstract {
     getQueryByType(type) {
         const request = this.request[this.config.fields[type]];
         return SearchBuilder
-            .prepareResponse(new constructors[type](this.Model, request, this.config)
+            .prepareResponse(new constructors[type](this.Model, request, this.globalRequest, this.config)
             .getQuery());
     }
     getSummaryQueries() {
-        const summaryBuilder = new summary_builder_1.SummaryBuilder(this.Model, this.request, this.config);
+        const summaryBuilder = new summary_builder_1.SummaryBuilder(this.Model, this.request, this.globalRequest, this.config);
         return summaryBuilder.getQuery();
     }
     getGroupQuery() {
-        const builder = new group_builder_1.GroupBuilder(this.Model, this.request, this.config);
+        const builder = new group_builder_1.GroupBuilder(this.Model, this.request, this.globalRequest, this.config);
         return builder.getQuery();
     }
     getAttributes() {
-        const summaryBuilder = new attribute_builder_1.AttributeBuilder(this.Model, this.request, this.config);
+        const summaryBuilder = new attribute_builder_1.AttributeBuilder(this.Model, this.request, this.globalRequest, this.config);
         return summaryBuilder.getAttributes();
     }
     getParanoid() {

@@ -11,7 +11,7 @@ class GroupBuilder extends builder_abstract_1.BuilderAbstract {
             return undefined;
         }
         return {
-            summary: new summary_builder_1.SummaryBuilder(this.Model, this.request, this.config).getQuery('groupSummary'),
+            summary: new summary_builder_1.SummaryBuilder(this.Model, this.request, this.globalRequest, this.config).getQuery('groupSummary'),
             groups: groups?.map((group) => {
                 const name = this.Model.name;
                 return {

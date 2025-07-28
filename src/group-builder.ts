@@ -10,7 +10,7 @@ export class GroupBuilder extends BuilderAbstract {
             return undefined
         }
         return {
-            summary: new SummaryBuilder(this.Model, this.request, this.config).getQuery('groupSummary'),
+            summary: new SummaryBuilder(this.Model, this.request, this.globalRequest, this.config).getQuery('groupSummary'),
             groups: groups?.map((group) => {
                 const name = this.Model.name
 

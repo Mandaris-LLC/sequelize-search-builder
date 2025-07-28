@@ -36,22 +36,22 @@ export class SearchBuilder extends BuilderAbstract {
     getQueryByType(type: 'filter' | 'order') {
         const request = this.request[this.config.fields[type]] as ParsedQs;
         return SearchBuilder
-            .prepareResponse(new constructors[type](this.Model, request, this.config)
+            .prepareResponse(new constructors[type](this.Model, request, this.globalRequest, this.config)
                 .getQuery()) as any;
     }
 
     getSummaryQueries() {
-        const summaryBuilder = new SummaryBuilder(this.Model, this.request, this.config)
+        const summaryBuilder = new SummaryBuilder(this.Model, this.request, this.globalRequest, this.config)
         return summaryBuilder.getQuery()
     }
 
     getGroupQuery() {
-        const builder = new GroupBuilder(this.Model, this.request, this.config)
+        const builder = new GroupBuilder(this.Model, this.request, this.globalRequest, this.config)
         return builder.getQuery()
     }
 
     getAttributes() {
-        const summaryBuilder = new AttributeBuilder(this.Model, this.request, this.config)
+        const summaryBuilder = new AttributeBuilder(this.Model, this.request, this.globalRequest, this.config)
         return summaryBuilder.getAttributes()
     }
 

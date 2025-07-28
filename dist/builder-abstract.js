@@ -5,13 +5,14 @@ const qs = require("qs");
 const lodash_1 = require("lodash");
 const config_1 = require("./config");
 class BuilderAbstract {
-    constructor(Model, request = {}, config = {}) {
+    constructor(Model, request = {}, globalRequest = {}, config = {}) {
         this.Model = Model;
         if (new.target === BuilderAbstract) {
             throw new TypeError('Cannot construct BuilderAbstract instances directly');
         }
         this.sequelize = Model.sequelize;
         this.request = BuilderAbstract.prepareRequest(request);
+        this.globalRequest = BuilderAbstract.prepareRequest(globalRequest);
         this.config = (0, lodash_1.merge)(config_1.default, config);
     }
     extractColumnTypes() {

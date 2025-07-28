@@ -20,8 +20,9 @@ export declare class BuilderAbstract {
     protected Model: SeqModelLike;
     protected config: Config;
     protected request: qs.ParsedQs;
+    protected globalRequest: qs.ParsedQs;
     protected sequelize: Sequelize;
-    constructor(Model: SeqModelLike, request?: qs.ParsedQs, config?: Partial<Config>);
+    constructor(Model: SeqModelLike, request?: qs.ParsedQs, globalRequest?: qs.ParsedQs, config?: Partial<Config>);
     protected extractColumnTypes(): {
         columnTypes: {
             [key: string]: string;

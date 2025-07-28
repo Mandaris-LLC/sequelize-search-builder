@@ -15,14 +15,16 @@ export interface SeqModelLike {
 export class BuilderAbstract {
     protected config: Config;
     protected request: qs.ParsedQs;
+    protected globalRequest: qs.ParsedQs;
     protected sequelize: Sequelize;
 
-    constructor(protected Model: SeqModelLike, request: qs.ParsedQs = {}, config: Partial<Config> = {}) {
+    constructor(protected Model: SeqModelLike, request: qs.ParsedQs = {}, globalRequest: qs.ParsedQs = {}, config: Partial<Config> = {}) {
         if (new.target === BuilderAbstract) {
             throw new TypeError('Cannot construct BuilderAbstract instances directly');
         }
         this.sequelize = Model.sequelize!
         this.request = BuilderAbstract.prepareRequest(request);
+        this.globalRequest = BuilderAbstract.prepareRequest(globalRequest);
         this.config = merge(defaultConfig, config);
     }
 

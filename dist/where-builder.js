@@ -49,7 +49,11 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                 if (this.config["filter-includes"]) {
                     for (const model in includeMap) {
                         if (!includeMap[model].association.through) {
-                            const builder = new WhereBuilder(includeMap[model].model, request);
+                            const globalRequestOptions = {};
+                            if (this.globalRequest['searchColumns'] && Array.isArray(this.globalRequest['searchColumns'])) {
+                                globalRequestOptions['searchColumns'] = this.globalRequest['searchColumns'].filter((name) => name.startsWith(model));
+                            }
+                            const builder = new WhereBuilder(includeMap[model].model, request, globalRequestOptions);
                             if (!foreignKeyInTarget(includeMap[model].association.associationType)) {
                                 const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'], raw: true });
                                 query[sequelize_1.Op.or].push({
@@ -83,19 +87,19 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                 if (Array.isArray(value)) {
                     query[operator] = [];
                     value.forEach((value) => {
-                        const builder = new WhereBuilder(this.Model, value);
+                        const builder = new WhereBuilder(this.Model, value, this.globalRequest);
                         query[operator].push(builder.getQuery());
                     });
                 }
                 else if (isObjectArray(value)) {
                     query[operator] = [];
                     Object.values(value).forEach((value) => {
-                        const builder = new WhereBuilder(this.Model, value);
+                        const builder = new WhereBuilder(this.Model, value, this.globalRequest);
                         query[operator].push(builder.getQuery());
                     });
                 }
                 else {
-                    const builder = new WhereBuilder(this.Model, value);
+                    const builder = new WhereBuilder(this.Model, value, this.globalRequest);
                     query[operator] = builder.getQuery();
                 }
             }
@@ -161,7 +165,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     };
                 }
                 if (map[model].association.associationType === 'BelongsToMany') {
-                    const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
+                    const builder = new WhereBuilder(map[model].model, { [rest[0]]: value }, this.globalRequest);
                     const attributes = ['id'];
                     const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(parentModel, {
                         include: [
@@ -183,7 +187,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     };
                 }
                 const attributes = foreignKeyInTarget(map[model].association.associationType) ? [map[model].association.foreignKey] : ['id'];
-                const builder = new WhereBuilder(map[model].model, { [rest[0]]: value });
+                const builder = new WhereBuilder(map[model].model, { [rest[0]]: value }, this.globalRequest);
                 const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(map[model].model, { where: builder.getQuery(), attributes: attributes, raw: true });
                 return {
                     col: foreignKeyInTarget(map[model].association.associationType) ? map[model].association.sourceKey : map[model].association.foreignKey,
@@ -201,17 +205,32 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
     getSearchableColumns(columnTypes) {
         return Object.entries(columnTypes)
             .filter(([_, columnType]) => columnType === 'STRING')
-            .map(([columnName, type]) => columnName);
+            .map(([columnName, type]) => columnName).filter((name) => {
+            if (this.globalRequest['searchColumns'] && Array.isArray(this.globalRequest['searchColumns'])) {
+                return this.globalRequest.searchColumns.includes(name);
+            }
+            return true;
+        });
     }
     getNumberColumns(columnTypes) {
         return Object.entries(columnTypes)
             .filter(([_, columnType]) => columnType === 'NUMBER' || columnType === 'INTEGER' || columnType === 'DECIMAL')
-            .map(([columnName, type]) => columnName);
+            .map(([columnName, type]) => columnName).filter((name) => {
+            if (this.globalRequest['searchColumns'] && Array.isArray(this.globalRequest['searchColumns'])) {
+                return this.globalRequest.searchColumns.includes(name);
+            }
+            return true;
+        });
     }
     getPotentialUUIDColumns(columnTypes) {
         return Object.entries(columnTypes)
             .filter(([_, columnType]) => columnType?.startsWith('UUID'))
-            .map(([columnName, type]) => columnName);
+            .map(([columnName, type]) => columnName).filter((name) => {
+            if (this.globalRequest['searchColumns'] && Array.isArray(this.globalRequest['searchColumns'])) {
+                return this.globalRequest.searchColumns.includes(name);
+            }
+            return true;
+        });
     }
     parseFilterValue(value, columnType) {
         if (typeof value === 'object' && value !== null) {
