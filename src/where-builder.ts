@@ -47,7 +47,7 @@ export class WhereBuilder extends BuilderAbstract {
                         if (!includeMap[model].association.through) {
                             const globalRequestOptions: any = {}
                             if (this.globalRequest['searchColumns'] && Array.isArray(this.globalRequest['searchColumns'])) {
-                                globalRequestOptions['searchColumns'] = (this.globalRequest['searchColumns'] as string[]).filter((name) => (name as string).startsWith(model))
+                                globalRequestOptions['searchColumns'] = (this.globalRequest['searchColumns'] as string[]).filter((name) => (name as string).startsWith(model)).map((name) => name.split('.').slice(1).join('.'));
                             }
                             const builder = new WhereBuilder(includeMap[model].model, request, globalRequestOptions);
                             if (!foreignKeyInTarget(includeMap[model].association.associationType)) {
