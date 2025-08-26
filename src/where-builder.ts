@@ -220,7 +220,7 @@ export class WhereBuilder extends BuilderAbstract {
 
     getPotentialUUIDColumns(columnTypes: { [key: string]: string }): string[] {
         return Object.entries(columnTypes)
-            .filter(([_, columnType]) => columnType?.startsWith('UUID'))
+            .filter(([_, columnType]) => columnType?.startsWith('UUID') || columnType?.startsWith('CHAR(36)'))
             .map(([columnName, type]) => columnName).filter((name) => {
                 if (this.globalRequest['searchColumns'] && Array.isArray(this.globalRequest['searchColumns'])) {
                     return this.globalRequest.searchColumns.includes(name as any)
