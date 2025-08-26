@@ -59,7 +59,7 @@ export class BuilderAbstract {
         }
 
         for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
-            columnTypes[attributeName] = (attribute.type as any).key;
+            columnTypes[attributeName] = typeof attribute.type === 'string' ? attribute.type : (attribute.type as any).key;
         }
 
         const includeMap = options.includeMap

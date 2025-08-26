@@ -41,7 +41,7 @@ class BuilderAbstract {
             options.attributes = Object.keys(this.Model.tableAttributes);
         }
         for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
-            columnTypes[attributeName] = attribute.type.key;
+            columnTypes[attributeName] = typeof attribute.type === 'string' ? attribute.type : attribute.type.key;
         }
         const includeMap = options.includeMap;
         return { columnTypes, includeMap };
