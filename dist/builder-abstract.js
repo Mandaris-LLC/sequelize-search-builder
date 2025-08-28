@@ -19,9 +19,9 @@ class BuilderAbstract {
         }
         this.config = (0, lodash_1.merge)(config_1.default, config);
     }
-    extractColumnTypes() {
+    extractColumnTypes(all = false) {
         const columnTypes = {};
-        let options = {};
+        let options = all ? { include: [{ all: true }] } : {};
         const tableNames = {};
         tableNames[this.Model.getTableName(options)] = true;
         this.Model._injectScope(options);

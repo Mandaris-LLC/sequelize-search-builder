@@ -23,7 +23,7 @@ export declare class BuilderAbstract {
     protected globalRequest: qs.ParsedQs;
     protected sequelize: Sequelize;
     constructor(Model: SeqModelLike, request?: qs.ParsedQs, globalRequest?: qs.ParsedQs, config?: Partial<Config>);
-    protected extractColumnTypes(): {
+    protected extractColumnTypes(all?: boolean): {
         columnTypes: {
             [key: string]: string;
         };

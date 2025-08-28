@@ -32,10 +32,10 @@ export class BuilderAbstract {
         this.config = merge(defaultConfig, config);
     }
 
-    protected extractColumnTypes(): { columnTypes: { [key: string]: string }, includeMap: IncludeMap } {
+    protected extractColumnTypes(all: boolean = false): { columnTypes: { [key: string]: string }, includeMap: IncludeMap } {
         const columnTypes: { [key: string]: string } = {};
 
-        let options = {} as any;
+        let options = all ? { include: [{ all: true }] } as any : {};
         const tableNames = {} as any;
 
         tableNames[(this.Model as any).getTableName(options)] = true;

@@ -15,6 +15,7 @@ export class WhereBuilder extends BuilderAbstract {
         const query: WhereAttributeHashValue<any> = {};
 
         const { columnTypes, includeMap } = this.extractColumnTypes();
+        const { includeMap: allIncludesMap } = this.extractColumnTypes(true);
 
 
         for (const [key, value] of Object.entries(request)) {
@@ -100,7 +101,7 @@ export class WhereBuilder extends BuilderAbstract {
                 if (columnType) {
                     query[key] = this.parseFilterValue(value, columnType);
                 } else if (this.config["filter-includes"]) {
-                    const result = this.getSubQueryOptions(this.Model, key, includeMap, value)
+                    const result = this.getSubQueryOptions(this.Model, key, allIncludesMap, value)
                     if (result) {
                         query[result.col] = result.filter;
                     }
@@ -124,7 +125,7 @@ export class WhereBuilder extends BuilderAbstract {
                         return undefined
                     }
                     const attributes = foreignKeyInTarget(map[model].association.associationType) ? [map[model].association.foreignKey] : ['id']
-                    const subQuery = findAllQueryAsSQL(map[model].model, {
+                    const subQuery = findAllQueryAsSQL(map[model].model.unscoped(), {
                         where: {
                             [subOptions.col]: subOptions.filter
                         },
@@ -162,7 +163,7 @@ export class WhereBuilder extends BuilderAbstract {
                     const subQuery = findAllQueryAsSQL(parentModel, {
                         include: [
                             {
-                                model: map[model].model,
+                                model: map[model].model.unscoped(),
                                 as: map[model].as,
                                 where: builder.getQuery(),
                                 required: true
