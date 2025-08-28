@@ -180,8 +180,8 @@ export class WhereBuilder extends BuilderAbstract {
                     }
                 }
                 const attributes = foreignKeyInTarget(map[model].association.associationType) ? [map[model].association.foreignKey] : ['id']
-                const builder = new WhereBuilder(map[model].model, { [rest[0]]: value }, this.globalRequest);
-                const subQuery = findAllQueryAsSQL(map[model].model, { where: builder.getQuery(), attributes: attributes, raw: true })
+                const builder = new WhereBuilder(map[model].model.unscoped(), { [rest[0]]: value }, this.globalRequest);
+                const subQuery = findAllQueryAsSQL(map[model].model.unscoped(), { where: builder.getQuery(), attributes: attributes, raw: true })
                 return {
                     col: foreignKeyInTarget(map[model].association.associationType) ? map[model].association.sourceKey : map[model].association.foreignKey,
                     filter: {
