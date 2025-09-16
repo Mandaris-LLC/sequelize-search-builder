@@ -71,22 +71,65 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     return sequelize_1.Op.not;
                 })();
                 if (Array.isArray(value)) {
+                    // Group sub queries by thir inlcude models (like '{"and":[{"intakes.location_id":{"=":"ba7152e4-797d-41e3-a601-03dd25aa8547"}},{"intakes.is_latest":{"=":"true"}}]}')
+                    const groupedByInclude = {};
+                    const passthrough = [];
+                    for (const clause of value) {
+                        if (clause && typeof clause === 'object') {
+                            const onlyKey = Object.keys(clause)[0];
+                            if (onlyKey && onlyKey.includes('.')) {
+                                // ToDo: might need to extend for deeper queries like invoice_items.item.type (only supports one level atm)
+                                const parts = onlyKey.split('.');
+                                if (parts.length === 2) {
+                                    const [alias, leaf] = parts;
+                                    groupedByInclude[alias] || (groupedByInclude[alias] = {});
+                                    groupedByInclude[alias][leaf] = clause[onlyKey];
+                                    continue;
+                                }
+                            }
+                        }
+                        // anything else -> fall back to original behavior
+                        passthrough.push(clause);
+                    }
                     query[operator] = [];
-                    value.forEach((value) => {
-                        const builder = new WhereBuilder(this.Model, value, this.globalRequest);
-                        query[operator].push(builder.getQuery());
-                    });
+                    // Create a single subquery per include alias
+                    for (const [alias, leafMap] of Object.entries(groupedByInclude)) {
+                        const inc = allIncludesMap[alias];
+                        if (!inc) {
+                            // fallback
+                            const b = new WhereBuilder(this.Model, { [alias]: leafMap }, this.globalRequest);
+                            query[operator].push(b.getQuery());
+                            continue;
+                        }
+                        const childBuilder = new WhereBuilder(inc.model, leafMap, this.globalRequest);
+                        const attrs = foreignKeyInTarget(inc.association.associationType)
+                            ? [inc.association.foreignKey]
+                            : ['id'];
+                        const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(inc.model.unscoped(), { where: childBuilder.getQuery(), attributes: attrs, raw: true });
+                        query[operator].push({
+                            [foreignKeyInTarget(inc.association.associationType)
+                                ? inc.association.sourceKey
+                                : inc.association.foreignKey]: {
+                                [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`),
+                            },
+                        });
+                    }
+                    // leftover clauses
+                    for (const clause of passthrough) {
+                        const b = new WhereBuilder(this.Model, clause, this.globalRequest);
+                        query[operator].push(b.getQuery());
+                    }
                 }
                 else if ((0, util_1.isObjectArray)(value)) {
                     query[operator] = [];
-                    Object.values(value).forEach((value) => {
-                        const builder = new WhereBuilder(this.Model, value, this.globalRequest);
-                        query[operator].push(builder.getQuery());
+                    Object.values(value).forEach((v) => {
+                        const b = new WhereBuilder(this.Model, v, this.globalRequest);
+                        query[operator].push(b.getQuery());
                     });
                 }
                 else {
-                    const builder = new WhereBuilder(this.Model, value, this.globalRequest);
-                    query[operator] = builder.getQuery();
+                    const b = new WhereBuilder(this.Model, value, this.globalRequest);
+                    query[operator] = b.getQuery();
                 }
             }
             else {
