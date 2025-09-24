@@ -113,6 +113,47 @@ export class WhereBuilder extends BuilderAbstract {
 
                     query[operator] = [];
 
+                    function normalizeGroupedLeafMap(leafMap: Record<string, any>) {
+                        const out: Record<string, any> = {};
+                        const orBucket: any[] = [];
+
+                        for (const [leaf, raw] of Object.entries(leafMap)) {
+                            // not an array -> leave untouched
+                            if (!Array.isArray(raw)) {
+                                out[leaf] = raw;
+                                continue;
+                            }
+
+                            // single entry -> keep original operator object (e.g. { "=": "x" })
+                            if (raw.length === 1) {
+                                out[leaf] = raw[0];
+                                continue;
+                            }
+
+                            // multiple entries -> if all are "="/eq, collapse to IN; else OR them
+                            const allEq = raw.every((cond) => {
+                                if (!cond || typeof cond !== 'object') return false;
+                                const ks = Object.keys(cond);
+                                return ks.length === 1 && (ks[0] === '=' || ks[0] === 'eq');
+                            });
+
+                            if (allEq) {
+                                out[leaf] = { in: raw.map((c) => (c['='] ?? c['eq'])) };
+                            } else {
+                                // keep each original operator by OR-ing them
+                                orBucket.push(...raw.map((c) => ({ [leaf]: c })));
+                            }
+                        }
+
+                        if (orBucket.length) {
+                            const existingOr = out['or'];
+                            out['or'] = Array.isArray(existingOr) ? existingOr.concat(orBucket) : orBucket;
+                        }
+
+                        return out;
+                    }
+
+
                     // Create a single subquery per include alias
                     for (const [alias, leafMap] of Object.entries(groupedByInclude)) {
                         const inc = allIncludesMap[alias];
@@ -123,7 +164,8 @@ export class WhereBuilder extends BuilderAbstract {
                             continue;
                         }
 
-                        const childBuilder = new WhereBuilder(inc.model, leafMap as any, this.globalRequest);
+                        const mergedLeafMap = normalizeGroupedLeafMap(leafMap);
+                        const childBuilder = new WhereBuilder(inc.model, mergedLeafMap, this.globalRequest);
                         const attrs = foreignKeyInTarget(inc.association.associationType)
                             ? [inc.association.foreignKey]
                             : ['id'];
