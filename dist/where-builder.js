@@ -83,7 +83,16 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                                 if (parts.length === 2) {
                                     const [alias, leaf] = parts;
                                     groupedByInclude[alias] || (groupedByInclude[alias] = {});
-                                    groupedByInclude[alias][leaf] = clause[onlyKey];
+                                    const val = clause[onlyKey];
+                                    if (groupedByInclude[alias][leaf] === undefined) {
+                                        groupedByInclude[alias][leaf] = [val];
+                                    }
+                                    else if (Array.isArray(groupedByInclude[alias][leaf])) {
+                                        groupedByInclude[alias][leaf].push(val);
+                                    }
+                                    else {
+                                        groupedByInclude[alias][leaf] = [groupedByInclude[alias][leaf], val];
+                                    }
                                     continue;
                                 }
                             }

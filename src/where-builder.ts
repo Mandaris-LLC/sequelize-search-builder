@@ -94,7 +94,15 @@ export class WhereBuilder extends BuilderAbstract {
                                 if (parts.length === 2) {
                                     const [alias, leaf] = parts;
                                     groupedByInclude[alias] ||= {};
-                                    groupedByInclude[alias][leaf] = (clause as any)[onlyKey];
+                                    const val = clause[onlyKey];
+                                    if (groupedByInclude[alias][leaf] === undefined) {
+                                        groupedByInclude[alias][leaf] = [val];
+                                    } else if (Array.isArray(groupedByInclude[alias][leaf])) {
+                                        groupedByInclude[alias][leaf].push(val);
+                                    } else {
+                                        groupedByInclude[alias][leaf] = [groupedByInclude[alias][leaf], val];
+                                    }
+
                                     continue;
                                 }
                             }
