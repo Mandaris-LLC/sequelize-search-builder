@@ -75,7 +75,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     const groupedByInclude = {};
                     const passthrough = [];
                     for (const clause of value) {
-                        if (clause && typeof clause === 'object') {
+                        if (clause && typeof clause === 'object' && key === 'and') {
                             const onlyKey = Object.keys(clause)[0];
                             if (onlyKey && onlyKey.includes('.')) {
                                 // ToDo: might need to extend for deeper queries like invoice_items.item.type (only supports one level atm)

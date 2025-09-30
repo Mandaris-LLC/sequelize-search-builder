@@ -86,7 +86,7 @@ export class WhereBuilder extends BuilderAbstract {
                     const passthrough: ParsedQs[] = [];
 
                     for (const clause of value as any[]) {
-                        if (clause && typeof clause === 'object') {
+                        if (clause && typeof clause === 'object' && key === 'and') {
                             const onlyKey = Object.keys(clause)[0];
                             if (onlyKey && onlyKey.includes('.')) {
                                 // ToDo: might need to extend for deeper queries like invoice_items.item.type (only supports one level atm)
