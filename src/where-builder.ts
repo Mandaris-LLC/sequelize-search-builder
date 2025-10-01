@@ -165,23 +165,46 @@ export class WhereBuilder extends BuilderAbstract {
                         }
 
                         const mergedLeafMap = normalizeGroupedLeafMap(leafMap);
-                        const childBuilder = new WhereBuilder(inc.model, mergedLeafMap, this.globalRequest);
-                        const attrs = foreignKeyInTarget(inc.association.associationType)
-                            ? [inc.association.foreignKey]
-                            : ['id'];
+                        if (inc.association.associationType === 'BelongsToMany') {
+                            const builder = new WhereBuilder(inc.model, mergedLeafMap, this.globalRequest);
+                            const attributes = ['id']
+                            const subQuery = findAllQueryAsSQL(this.Model, {
+                                include: [
+                                    {
+                                        model: inc.model.unscoped(),
+                                        as: inc.as,
+                                        where: builder.getQuery(),
+                                        required: true
+                                    }
+                                ],
+                                attributes: attributes,
+                                raw: true
+                            })
+                            query[operator].push({
+                                [inc.association.sourceKey]: {
+                                    [Op.in]: this.sequelize.literal(`(${subQuery})`),
+                                }
+                            })
 
-                        const subQuery = findAllQueryAsSQL(
-                            inc.model.unscoped(),
-                            { where: childBuilder.getQuery(), attributes: attrs, raw: true }
-                        );
+                        } else {
+                            const childBuilder = new WhereBuilder(inc.model, mergedLeafMap, this.globalRequest);
+                            const attrs = foreignKeyInTarget(inc.association.associationType)
+                                ? [inc.association.foreignKey]
+                                : ['id'];
 
-                        query[operator].push({
-                            [foreignKeyInTarget(inc.association.associationType)
-                                ? inc.association.sourceKey
-                                : inc.association.foreignKey]: {
-                                [Op.in]: this.sequelize.literal(`(${subQuery})`),
-                            },
-                        });
+                            const subQuery = findAllQueryAsSQL(
+                                inc.model.unscoped(),
+                                { where: childBuilder.getQuery(), attributes: attrs, raw: true }
+                            );
+
+                            query[operator].push({
+                                [foreignKeyInTarget(inc.association.associationType)
+                                    ? inc.association.sourceKey
+                                    : inc.association.foreignKey]: {
+                                    [Op.in]: this.sequelize.literal(`(${subQuery})`),
+                                },
+                            });
+                        }
                     }
 
                     // leftover clauses
