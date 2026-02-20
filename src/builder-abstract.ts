@@ -32,9 +32,38 @@ export class BuilderAbstract {
         this.config = merge(defaultConfig, config);
     }
 
-    protected extractColumnTypes(all: boolean = false): { columnTypes: { [key: string]: string }, includeMap: IncludeMap } {
+    protected getColumnTypes(): { columnTypes: { [key: string]: string } } {
         const columnTypes: { [key: string]: string } = {};
 
+        for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
+            columnTypes[attributeName] = typeof attribute.type === 'string' ? attribute.type : (attribute.type as any).key;
+        }
+
+        return { columnTypes };
+    }
+
+    protected getIncludeMaps(): { includeMap: IncludeMap } {
+        const { includeMap: currentIncludes } = this._getIncludeMaps();
+        const { includeMap: allIncludes } = this._getIncludeMaps(true);
+        // deep merge into all
+        const includeMap = this.mergeMap(allIncludes, currentIncludes);
+        return { includeMap };
+    }
+
+    private mergeMap(target: IncludeMap, source: IncludeMap): IncludeMap {
+        for (const key in source) {
+            if (source.hasOwnProperty(key)) {
+                if (target[key]) {
+                    this.mergeMap(target[key], source[key]);
+                } else {
+                    target[key] = source[key];
+                }
+            }
+        }
+        return target;
+    }
+
+    private _getIncludeMaps(all: boolean = false): { includeMap: IncludeMap } {
         let options = all ? { include: [{ all: true }] } as any : {};
         const tableNames = {} as any;
 
@@ -57,13 +86,9 @@ export class BuilderAbstract {
         if (!options.attributes) {
             options.attributes = Object.keys((this.Model as any).tableAttributes);
         }
-
-        for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
-            columnTypes[attributeName] = typeof attribute.type === 'string' ? attribute.type : (attribute.type as any).key;
-        }
-
         const includeMap = options.includeMap
-        return { columnTypes, includeMap };
+
+        return { includeMap };
     }
 
     /**

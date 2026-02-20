@@ -23,12 +23,16 @@ export declare class BuilderAbstract {
     protected globalRequest: qs.ParsedQs;
     protected sequelize: Sequelize;
     constructor(Model: SeqModelLike, request?: qs.ParsedQs, globalRequest?: qs.ParsedQs, config?: Partial<Config>);
-    protected extractColumnTypes(all?: boolean): {
+    protected getColumnTypes(): {
         columnTypes: {
             [key: string]: string;
         };
+    };
+    protected getIncludeMaps(): {
         includeMap: IncludeMap;
     };
+    private mergeMap;
+    private _getIncludeMaps;
     /**
      * Transform request to request object
      * @param {(Object|string)} request

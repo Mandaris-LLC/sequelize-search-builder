@@ -4,10 +4,10 @@ export class OrderBuilder extends BuilderAbstract {
     getQuery() {
         const { request } = this;
         const query: any[] = [];
-        const types = this.extractColumnTypes()
+        const { columnTypes } = this.getColumnTypes()
         Object.keys(request).forEach((key) => {
             const [topKey] = key.split('.');
-            const isJson = types.columnTypes[topKey] === 'JSON';
+            const isJson = columnTypes[topKey] === 'JSON';
 
             const value = isJson
                 ? [key, (request[key] as string).trim()]

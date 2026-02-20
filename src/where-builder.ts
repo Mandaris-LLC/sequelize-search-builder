@@ -14,8 +14,8 @@ export class WhereBuilder extends BuilderAbstract {
         const { request } = this;
         const query: WhereAttributeHashValue<any> = {};
 
-        const { columnTypes, includeMap } = this.extractColumnTypes();
-        const { includeMap: allIncludesMap } = this.extractColumnTypes(true);
+        const { columnTypes } = this.getColumnTypes();
+        const { includeMap } = this.getIncludeMaps();
 
 
         for (const [key, value] of Object.entries(request)) {
@@ -156,7 +156,7 @@ export class WhereBuilder extends BuilderAbstract {
 
                     // Create a single subquery per include alias
                     for (const [alias, leafMap] of Object.entries(groupedByInclude)) {
-                        const inc = allIncludesMap[alias];
+                        const inc = includeMap[alias];
                         if (!inc) {
                             // fallback
                             const b = new WhereBuilder(this.Model, { [alias]: leafMap } as any, this.globalRequest);
@@ -227,7 +227,7 @@ export class WhereBuilder extends BuilderAbstract {
                 if (columnType) {
                     query[key] = this.parseFilterValue(value, columnType);
                 } else if (this.config["filter-includes"]) {
-                    const result = this.getSubQueryOptions(this.Model, key, allIncludesMap, value)
+                    const result = this.getSubQueryOptions(this.Model, key, includeMap, value)
                     if (result) {
                         query[result.col] = result.filter;
                     }

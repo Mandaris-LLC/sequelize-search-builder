@@ -12,8 +12,8 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
     getQuery() {
         const { request } = this;
         const query = {};
-        const { columnTypes, includeMap } = this.extractColumnTypes();
-        const { includeMap: allIncludesMap } = this.extractColumnTypes(true);
+        const { columnTypes } = this.getColumnTypes();
+        const { includeMap } = this.getIncludeMaps();
         for (const [key, value] of Object.entries(request)) {
             if (key === '_q' && value !== '') {
                 const searchColumns = this.getSearchableColumns(columnTypes);
@@ -138,7 +138,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     }
                     // Create a single subquery per include alias
                     for (const [alias, leafMap] of Object.entries(groupedByInclude)) {
-                        const inc = allIncludesMap[alias];
+                        const inc = includeMap[alias];
                         if (!inc) {
                             // fallback
                             const b = new WhereBuilder(this.Model, { [alias]: leafMap }, this.globalRequest);
@@ -206,7 +206,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     query[key] = this.parseFilterValue(value, columnType);
                 }
                 else if (this.config["filter-includes"]) {
-                    const result = this.getSubQueryOptions(this.Model, key, allIncludesMap, value);
+                    const result = this.getSubQueryOptions(this.Model, key, includeMap, value);
                     if (result) {
                         query[result.col] = result.filter;
                     }
