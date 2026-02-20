@@ -9,6 +9,11 @@ function foreignKeyInTarget(associationType) {
     return associationType === 'HasMany' || associationType === 'HasOne';
 }
 class WhereBuilder extends builder_abstract_1.BuilderAbstract {
+    constructor(Model, request = {}, globalRequest = {}, config = {}, visited) {
+        super(Model, request, globalRequest, config);
+        this.visited = visited ? new Set(visited) : new Set();
+        this.visited.add(Model.name);
+    }
     getQuery() {
         const { request } = this;
         const query = {};
@@ -35,11 +40,14 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                 if (this.config["filter-includes"]) {
                     for (const model in includeMap) {
                         if (!includeMap[model].association.through) {
+                            if (this.visited.has(includeMap[model].model.name)) {
+                                continue;
+                            }
                             const globalRequestOptions = {};
                             if (this.globalRequest['searchColumns'] && Array.isArray(this.globalRequest['searchColumns'])) {
                                 globalRequestOptions['searchColumns'] = this.globalRequest['searchColumns'].filter((name) => name.startsWith(model)).map((name) => name.split('.').slice(1).join('.'));
                             }
-                            const builder = new WhereBuilder(includeMap[model].model, request, globalRequestOptions);
+                            const builder = new WhereBuilder(includeMap[model].model, request, globalRequestOptions, {}, this.visited);
                             if (!foreignKeyInTarget(includeMap[model].association.associationType)) {
                                 const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'], raw: true });
                                 query[sequelize_1.Op.or].push({

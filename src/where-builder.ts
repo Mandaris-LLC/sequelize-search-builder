@@ -9,6 +9,13 @@ function foreignKeyInTarget(associationType: string) {
 }
 
 export class WhereBuilder extends BuilderAbstract {
+    private visited: Set<string>;
+
+    constructor(Model: SeqModelLike, request: ParsedQs = {}, globalRequest: ParsedQs = {}, config: any = {}, visited?: Set<string>) {
+        super(Model, request, globalRequest, config);
+        this.visited = visited ? new Set(visited) : new Set<string>();
+        this.visited.add(Model.name);
+    }
 
     getQuery() {
         const { request } = this;
@@ -46,11 +53,14 @@ export class WhereBuilder extends BuilderAbstract {
                 if (this.config["filter-includes"]) {
                     for (const model in includeMap) {
                         if (!includeMap[model].association.through) {
+                            if (this.visited.has(includeMap[model].model.name)) {
+                                continue;
+                            }
                             const globalRequestOptions: any = {}
                             if (this.globalRequest['searchColumns'] && Array.isArray(this.globalRequest['searchColumns'])) {
                                 globalRequestOptions['searchColumns'] = (this.globalRequest['searchColumns'] as string[]).filter((name) => (name as string).startsWith(model)).map((name) => name.split('.').slice(1).join('.'));
                             }
-                            const builder = new WhereBuilder(includeMap[model].model, request, globalRequestOptions);
+                            const builder = new WhereBuilder(includeMap[model].model, request, globalRequestOptions, {}, this.visited);
                             if (!foreignKeyInTarget(includeMap[model].association.associationType)) {
                                 const subQuery = findAllQueryAsSQL(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'], raw: true })
                                 query[Op.or as any].push({
