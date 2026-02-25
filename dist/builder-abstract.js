@@ -31,7 +31,7 @@ class BuilderAbstract {
         const { includeMap: allIncludes } = this._getIncludeMaps(true);
         // deep merge into all
         const includeMap = this.mergeMap(allIncludes, currentIncludes);
-        return { includeMap };
+        return { includeMap, currentIncludes };
     }
     mergeMap(target, source) {
         for (const key in source) {

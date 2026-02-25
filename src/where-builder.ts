@@ -22,7 +22,7 @@ export class WhereBuilder extends BuilderAbstract {
         const query: WhereAttributeHashValue<any> = {};
 
         const { columnTypes } = this.getColumnTypes();
-        const { includeMap } = this.getIncludeMaps();
+        const { includeMap, currentIncludes } = this.getIncludeMaps();
 
 
         for (const [key, value] of Object.entries(request)) {
@@ -51,27 +51,27 @@ export class WhereBuilder extends BuilderAbstract {
 
 
                 if (this.config["filter-includes"]) {
-                    for (const model in includeMap) {
-                        if (!includeMap[model].association.through) {
-                            if (this.visited.has(includeMap[model].model.name)) {
+                    for (const model in currentIncludes) {
+                        if (!currentIncludes[model].association.through) {
+                            if (this.visited.has(currentIncludes[model].model.name)) {
                                 continue;
                             }
                             const globalRequestOptions: any = {}
                             if (this.globalRequest['searchColumns'] && Array.isArray(this.globalRequest['searchColumns'])) {
                                 globalRequestOptions['searchColumns'] = (this.globalRequest['searchColumns'] as string[]).filter((name) => (name as string).startsWith(model)).map((name) => name.split('.').slice(1).join('.'));
                             }
-                            const builder = new WhereBuilder(includeMap[model].model, request, globalRequestOptions, {}, this.visited);
-                            if (!foreignKeyInTarget(includeMap[model].association.associationType)) {
-                                const subQuery = findAllQueryAsSQL(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'], raw: true })
+                            const builder = new WhereBuilder(currentIncludes[model].model, request, globalRequestOptions, {}, this.visited);
+                            if (!foreignKeyInTarget(currentIncludes[model].association.associationType)) {
+                                const subQuery = findAllQueryAsSQL(currentIncludes[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'], raw: true })
                                 query[Op.or as any].push({
-                                    [includeMap[model].association.foreignKey]: {
+                                    [currentIncludes[model].association.foreignKey]: {
                                         [Op.in]: this.sequelize.literal(`(${subQuery})`)
                                     }
                                 })
                             } else {
-                                const subQuery = findAllQueryAsSQL(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: [includeMap[model].association.foreignKey], raw: true })
+                                const subQuery = findAllQueryAsSQL(currentIncludes[model].model.unscoped(), { where: builder.getQuery(), attributes: [currentIncludes[model].association.foreignKey], raw: true })
                                 query[Op.or as any].push({
-                                    [includeMap[model].association.sourceKey]: {
+                                    [currentIncludes[model].association.sourceKey]: {
                                         [Op.in]: this.sequelize.literal(`(${subQuery})`)
                                     }
                                 })

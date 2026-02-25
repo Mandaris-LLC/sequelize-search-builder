@@ -42,12 +42,12 @@ export class BuilderAbstract {
         return { columnTypes };
     }
 
-    protected getIncludeMaps(): { includeMap: IncludeMap } {
+    protected getIncludeMaps(): { includeMap: IncludeMap, currentIncludes: IncludeMap } {
         const { includeMap: currentIncludes } = this._getIncludeMaps();
         const { includeMap: allIncludes } = this._getIncludeMaps(true);
         // deep merge into all
         const includeMap = this.mergeMap(allIncludes, currentIncludes);
-        return { includeMap };
+        return { includeMap, currentIncludes };
     }
 
     private mergeMap(target: IncludeMap, source: IncludeMap): IncludeMap {

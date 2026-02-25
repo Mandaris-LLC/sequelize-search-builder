@@ -30,6 +30,7 @@ export declare class BuilderAbstract {
     };
     protected getIncludeMaps(): {
         includeMap: IncludeMap;
+        currentIncludes: IncludeMap;
     };
     private mergeMap;
     private _getIncludeMaps;
