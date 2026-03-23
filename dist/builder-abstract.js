@@ -37,7 +37,9 @@ class BuilderAbstract {
         for (const key in source) {
             if (source.hasOwnProperty(key)) {
                 if (target[key]) {
-                    this.mergeMap(target[key].includeMap, source[key].includeMap);
+                    if (target[key].includeMap && source[key].includeMap) {
+                        this.mergeMap(target[key].includeMap, source[key].includeMap);
+                    }
                 }
                 else {
                     target[key] = source[key];
