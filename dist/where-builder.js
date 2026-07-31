@@ -9,11 +9,16 @@ function foreignKeyInTarget(associationType) {
     return associationType === 'HasMany' || associationType === 'HasOne';
 }
 class WhereBuilder extends builder_abstract_1.BuilderAbstract {
+    constructor(Model, request = {}, globalRequest = {}, config = {}, visited) {
+        super(Model, request, globalRequest, config);
+        this.visited = visited ? new Set(visited) : new Set();
+        this.visited.add(Model.name);
+    }
     getQuery() {
         const { request } = this;
         const query = {};
-        const { columnTypes, includeMap } = this.extractColumnTypes();
-        const { includeMap: allIncludesMap } = this.extractColumnTypes(true);
+        const { columnTypes } = this.getColumnTypes();
+        const { includeMap, currentIncludes } = this.getIncludeMaps();
         for (const [key, value] of Object.entries(request)) {
             if (key === '_q' && value !== '') {
                 const searchColumns = this.getSearchableColumns(columnTypes);
@@ -33,25 +38,28 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     },
                 })));
                 if (this.config["filter-includes"]) {
-                    for (const model in includeMap) {
-                        if (!includeMap[model].association.through) {
+                    for (const model in currentIncludes) {
+                        if (!currentIncludes[model].association.through) {
+                            if (this.visited.has(currentIncludes[model].model.name)) {
+                                continue;
+                            }
                             const globalRequestOptions = {};
                             if (this.globalRequest['searchColumns'] && Array.isArray(this.globalRequest['searchColumns'])) {
                                 globalRequestOptions['searchColumns'] = this.globalRequest['searchColumns'].filter((name) => name.startsWith(model)).map((name) => name.split('.').slice(1).join('.'));
                             }
-                            const builder = new WhereBuilder(includeMap[model].model, request, globalRequestOptions);
-                            if (!foreignKeyInTarget(includeMap[model].association.associationType)) {
-                                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'], raw: true });
+                            const builder = new WhereBuilder(currentIncludes[model].model, request, globalRequestOptions, {}, this.visited);
+                            if (!foreignKeyInTarget(currentIncludes[model].association.associationType)) {
+                                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(currentIncludes[model].model.unscoped(), { where: builder.getQuery(), attributes: ['id'], raw: true });
                                 query[sequelize_1.Op.or].push({
-                                    [includeMap[model].association.foreignKey]: {
+                                    [currentIncludes[model].association.foreignKey]: {
                                         [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
                                     }
                                 });
                             }
                             else {
-                                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(includeMap[model].model.unscoped(), { where: builder.getQuery(), attributes: [includeMap[model].association.foreignKey], raw: true });
+                                const subQuery = (0, sql_generator_1.findAllQueryAsSQL)(currentIncludes[model].model.unscoped(), { where: builder.getQuery(), attributes: [currentIncludes[model].association.foreignKey], raw: true });
                                 query[sequelize_1.Op.or].push({
-                                    [includeMap[model].association.sourceKey]: {
+                                    [currentIncludes[model].association.sourceKey]: {
                                         [sequelize_1.Op.in]: this.sequelize.literal(`(${subQuery})`)
                                     }
                                 });
@@ -138,7 +146,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     }
                     // Create a single subquery per include alias
                     for (const [alias, leafMap] of Object.entries(groupedByInclude)) {
-                        const inc = allIncludesMap[alias];
+                        const inc = includeMap[alias];
                         if (!inc) {
                             // fallback
                             const b = new WhereBuilder(this.Model, { [alias]: leafMap }, this.globalRequest);
@@ -206,7 +214,7 @@ class WhereBuilder extends builder_abstract_1.BuilderAbstract {
                     query[key] = this.parseFilterValue(value, columnType);
                 }
                 else if (this.config["filter-includes"]) {
-                    const result = this.getSubQueryOptions(this.Model, key, allIncludesMap, value);
+                    const result = this.getSubQueryOptions(this.Model, key, includeMap, value);
                     if (result) {
                         query[result.col] = result.filter;
                     }

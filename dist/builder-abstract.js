@@ -19,8 +19,36 @@ class BuilderAbstract {
         }
         this.config = (0, lodash_1.merge)(config_1.default, config);
     }
-    extractColumnTypes(all = false) {
+    getColumnTypes() {
         const columnTypes = {};
+        for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
+            columnTypes[attributeName] = typeof attribute.type === 'string' ? attribute.type : attribute.type.key;
+        }
+        return { columnTypes };
+    }
+    getIncludeMaps() {
+        const { includeMap: currentIncludes } = this._getIncludeMaps();
+        const { includeMap: allIncludes } = this._getIncludeMaps(true);
+        // deep merge into all
+        const includeMap = this.mergeMap(allIncludes, currentIncludes);
+        return { includeMap, currentIncludes };
+    }
+    mergeMap(target, source) {
+        for (const key in source) {
+            if (source.hasOwnProperty(key)) {
+                if (target[key]) {
+                    if (target[key].includeMap && source[key].includeMap) {
+                        this.mergeMap(target[key].includeMap, source[key].includeMap);
+                    }
+                }
+                else {
+                    target[key] = source[key];
+                }
+            }
+        }
+        return target;
+    }
+    _getIncludeMaps(all = false) {
         let options = all ? { include: [{ all: true }] } : {};
         const tableNames = {};
         tableNames[this.Model.getTableName(options)] = true;
@@ -40,11 +68,8 @@ class BuilderAbstract {
         if (!options.attributes) {
             options.attributes = Object.keys(this.Model.tableAttributes);
         }
-        for (const [attributeName, attribute] of Object.entries(this.Model.rawAttributes)) {
-            columnTypes[attributeName] = typeof attribute.type === 'string' ? attribute.type : attribute.type.key;
-        }
         const includeMap = options.includeMap;
-        return { columnTypes, includeMap };
+        return { includeMap };
     }
     /**
      * Transform request to request object
