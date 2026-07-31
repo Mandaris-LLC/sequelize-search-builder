@@ -5,7 +5,9 @@ export class SummaryBuilder extends BuilderAbstract {
     getQuery(key = 'totalSummary') {
         const { request } = this;
         const summaries = request[key] as { selector: string, summaryType: 'sum' | 'count' }[]
-
+        if (!Array.isArray(summaries)) {
+            return {};
+        }
         return summaries?.reduce((prev, summary) => {
             const name = this.Model.name
             prev[summary.selector] = {
