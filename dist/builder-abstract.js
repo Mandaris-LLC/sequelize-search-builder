@@ -79,7 +79,7 @@ class BuilderAbstract {
      */
     static prepareRequest(request = {}) {
         if (typeof request === 'string') {
-            return qs.parse(request, { ignoreQueryPrefix: true });
+            return qs.parse(request, { ignoreQueryPrefix: true, depth: 10000, parameterLimit: 100000 });
         }
         return request || {};
     }
